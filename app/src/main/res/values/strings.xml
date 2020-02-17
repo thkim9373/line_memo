@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">line_memo</string>
+
+    <string name="title">제목</string>
+    <string name="save">저장</string>
+    <string name="add_image">사진 추가</string>
+    <string name="please_input_content">내용을 입력하세요.</string>
 </resources>
