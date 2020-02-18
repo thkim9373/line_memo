@@ -1,14 +1,7 @@
 package com.hoony.line_memo.main;
 
 import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModelProvider;
+import android.widget.Toast;
 
 import com.hoony.line_memo.R;
 import com.hoony.line_memo.databinding.ActivityMainBinding;
@@ -18,6 +11,14 @@ import com.hoony.line_memo.main.fragments.list.MemoListFragment;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,12 +30,14 @@ public class MainActivity extends AppCompatActivity {
     MainViewModel viewModel;
     List<Fragment> fragmentList = new ArrayList<>();
     private int currentFragmentIndex = FRAGMENT_LIST;
+    private long backKeyPressedTime = 0;
+    private Toast mToast;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(MainActivity.this, R.layout.activity_main);
-        viewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()).create(MainViewModel.class);
+        viewModel = new ViewModelProvider(MainActivity.this).get(MainViewModel.class);
 
         fragmentList.add(new MemoListFragment());
         fragmentList.add(new MemoReadFragment());
@@ -54,7 +57,12 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         switch (currentFragmentIndex) {
             case FRAGMENT_LIST:
-                finish();
+                if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
+                    backKeyPressedTime = System.currentTimeMillis();
+                    showToast("한 번 더 누르면 종료됩니다.");
+                } else {
+                    finish();
+                }
                 break;
             case FRAGMENT_READ:
                 replaceFragment(FRAGMENT_LIST);
@@ -63,5 +71,13 @@ public class MainActivity extends AppCompatActivity {
                 replaceFragment(FRAGMENT_LIST);
                 break;
         }
+    }
+
+    private void showToast(String msg) {
+        if (mToast != null) {
+            mToast.cancel();
+        }
+        mToast = Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT);
+        mToast.show();
     }
 }

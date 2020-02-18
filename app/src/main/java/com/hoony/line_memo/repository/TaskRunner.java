@@ -7,6 +7,7 @@ import com.hoony.line_memo.db.table.memo.Memo;
 import com.hoony.line_memo.repository.task.DeleteMemoTask;
 import com.hoony.line_memo.repository.task.GetAllMemoTask;
 import com.hoony.line_memo.repository.task.InsertMemoTask;
+import com.hoony.line_memo.repository.task.UpdateMemoTask;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -36,6 +37,17 @@ public class TaskRunner {
                 handler.post(callback::onInsertMemoTaskSuccess);
             } catch (Exception e) {
                 handler.post(() -> callback.onInsertMemoTaskFail(e));
+            }
+        });
+    }
+
+    void executeUpdateMemoTaskAsync(final Callable callable, UpdateMemoTask.UpdateMemoTaskCallback callback) {
+        executor.execute(() -> {
+            try {
+                callable.call();
+                handler.post(callback::onUpdateMemoTaskSuccess);
+            } catch (Exception e) {
+                handler.post(() -> callback.onUpdateMemoTaskFail(e));
             }
         });
     }

@@ -5,17 +5,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.GridLayoutManager;
-
 import com.hoony.line_memo.R;
 import com.hoony.line_memo.databinding.FragmentMemoListBinding;
 import com.hoony.line_memo.main.MainActivity;
 import com.hoony.line_memo.main.MainViewModel;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
 
 public class MemoListFragment extends Fragment implements View.OnClickListener, MemoAdapter.onItemClickListener {
 
@@ -40,7 +40,7 @@ public class MemoListFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel = ViewModelProviders.of(MemoListFragment.this).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
         setObserve();
     }
 
@@ -49,7 +49,7 @@ public class MemoListFragment extends Fragment implements View.OnClickListener, 
     }
 
     private void setObserve() {
-        viewModel.getMemoListMutableData().observe(MemoListFragment.this, memoList -> {
+        viewModel.getMemoListMutableData().observe(getViewLifecycleOwner(), memoList -> {
             MemoAdapter adapter = (MemoAdapter) binding.svMemo.getAdapter();
             if (adapter == null) {
                 adapter = new MemoAdapter(memoList);
@@ -69,13 +69,14 @@ public class MemoListFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.fab_create_memo) {
+            viewModel.getCurrentMemoMutableData().setValue(null);
             ((MainActivity) requireActivity()).replaceFragment(MainActivity.FRAGMENT_WRITE);
         }
     }
 
     @Override
     public void onItemClick(int position) {
-        viewModel.setTargetMemoMutableData(position);
+        viewModel.setCurrentMemoMutableData(position);
         ((MainActivity) requireActivity()).replaceFragment(MainActivity.FRAGMENT_READ);
     }
 }

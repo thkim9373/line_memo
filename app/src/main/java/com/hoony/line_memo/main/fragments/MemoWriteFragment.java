@@ -5,15 +5,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.hoony.line_memo.R;
+import com.hoony.line_memo.databinding.FragmentMemoEditBinding;
+import com.hoony.line_memo.main.MainActivity;
+import com.hoony.line_memo.main.MainViewModel;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
-
-import com.hoony.line_memo.R;
-import com.hoony.line_memo.databinding.FragmentMemoEditBinding;
-import com.hoony.line_memo.main.MainViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 public class MemoWriteFragment extends Fragment implements View.OnClickListener {
 
@@ -37,12 +38,20 @@ public class MemoWriteFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel = ViewModelProviders.of(MemoWriteFragment.this).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
         setObserve();
     }
 
     private void setObserve() {
-
+        viewModel.getCurrentMemoMutableData().observe(getViewLifecycleOwner(), memo -> {
+            if (memo != null) {
+                binding.etTitle.setText(memo.getTitle());
+                binding.etContent.setText(memo.getContent());
+            } else {
+                binding.etTitle.setText("");
+                binding.etContent.setText("");
+            }
+        });
     }
 
     private void setListener() {
@@ -52,6 +61,9 @@ public class MemoWriteFragment extends Fragment implements View.OnClickListener 
 
     @Override
     public void onClick(View view) {
-
+        if (view.getId() == R.id.bt_save) {
+            viewModel.saveMemo(binding.etTitle.getText().toString(), binding.etContent.getText().toString());
+            ((MainActivity) requireActivity()).replaceFragment(MainActivity.FRAGMENT_READ);
+        }
     }
 }
