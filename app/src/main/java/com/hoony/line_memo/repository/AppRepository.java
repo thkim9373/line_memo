@@ -9,6 +9,8 @@ import com.hoony.line_memo.repository.task.DeleteMemoTask;
 import com.hoony.line_memo.repository.task.GetAllMemoTask;
 import com.hoony.line_memo.repository.task.InsertMemoTask;
 
+import java.util.List;
+
 public class AppRepository {
     private static AppRepository INSTANCE;
 
@@ -36,8 +38,8 @@ public class AppRepository {
         taskRunner.executeInsertMemoTaskAsync(new InsertMemoTask(memoDao, memo), callback);
     }
 
-    public void deleteMemo(Memo memo, DeleteMemoTask.DeleteMemoTaskCallback callback) {
+    public void deleteMemo(List<Memo> memoList, DeleteMemoTask.DeleteMemoTaskCallback callback) {
         TaskRunner taskRunner = new TaskRunner();
-        taskRunner.executeDeleteMemoTaskAsync(new DeleteMemoTask(memoDao, memo), callback);
+        taskRunner.executeDeleteMemoTaskAsync(new DeleteMemoTask(memoDao, memoList), callback);
     }
 }

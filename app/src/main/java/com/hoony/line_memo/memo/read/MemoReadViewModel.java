@@ -1,6 +1,10 @@
-package com.hoony.line_memo.memo;
+package com.hoony.line_memo.memo.read;
 
 import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
 
 import com.hoony.line_memo.db.table.memo.Memo;
 import com.hoony.line_memo.repository.AppRepository;
@@ -10,13 +14,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.MutableLiveData;
+public class MemoReadViewModel extends AndroidViewModel implements InsertMemoTask.InsertMemoTaskCallback {
 
-public class MemoViewModel extends AndroidViewModel implements InsertMemoTask.InsertMemoTaskCallback {
-
-    public MemoViewModel(@NonNull Application application) {
+    public MemoReadViewModel(@NonNull Application application) {
         super(application);
         repository = AppRepository.getINSTANCE(application);
     }
@@ -37,7 +37,7 @@ public class MemoViewModel extends AndroidViewModel implements InsertMemoTask.In
         String date = dateFormat.format(new Date());
 
         memo.setDate(date);
-        repository.saveMemo(memo, MemoViewModel.this);
+        repository.saveMemo(memo, MemoReadViewModel.this);
     }
 
     @Override

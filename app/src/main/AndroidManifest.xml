@@ -16,7 +16,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".memo.MemoActivity" />
+        <activity android:name=".memoList.write.MemoWriteActivity" />
+        <activity android:name=".memo.read.MemoReadActivity" />
     </application>
 
 </manifest>
