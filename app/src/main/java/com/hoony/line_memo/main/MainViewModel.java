@@ -2,6 +2,11 @@ package com.hoony.line_memo.main;
 
 import android.app.Application;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
+
+import com.hoony.line_memo.db.pojo.ImageData;
 import com.hoony.line_memo.db.table.memo.Memo;
 import com.hoony.line_memo.repository.AppRepository;
 import com.hoony.line_memo.repository.task.DeleteMemoTask;
@@ -10,13 +15,10 @@ import com.hoony.line_memo.repository.task.InsertMemoTask;
 import com.hoony.line_memo.repository.task.UpdateMemoTask;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.MutableLiveData;
 
 public class MainViewModel extends AndroidViewModel
         implements GetAllMemoTask.GetAllMemoTaskCallback,
@@ -24,17 +26,28 @@ public class MainViewModel extends AndroidViewModel
         DeleteMemoTask.DeleteMemoTaskCallback,
         UpdateMemoTask.UpdateMemoTaskCallback {
 
+    public static final int FRAGMENT_LIST = 0;
+    public static final int FRAGMENT_READ = 1;
+    public static final int FRAGMENT_WRITE = 2;
+
     public MainViewModel(@NonNull Application application) {
         super(application);
         appRepository = AppRepository.getINSTANCE(application);
         getAllMemo();
+        this.fragmentIndex.setValue(FRAGMENT_LIST);
     }
 
     private final AppRepository appRepository;
 
+    private MutableLiveData<Integer> fragmentIndex = new MutableLiveData<>();
+
     private MutableLiveData<List<Memo>> memoListMutableData = new MutableLiveData<>();
 
     private MutableLiveData<Memo> currentMemoMutableData = new MutableLiveData<>();
+
+    MutableLiveData<Integer> getFragmentIndex() {
+        return fragmentIndex;
+    }
 
     public MutableLiveData<List<Memo>> getMemoListMutableData() {
         return memoListMutableData;
@@ -42,6 +55,10 @@ public class MainViewModel extends AndroidViewModel
 
     public MutableLiveData<Memo> getCurrentMemoMutableData() {
         return currentMemoMutableData;
+    }
+
+    public void setFragmentIndex(int fragmentIndex) {
+        this.fragmentIndex.setValue(fragmentIndex);
     }
 
     public void setCurrentMemoMutableData(int position) {
@@ -53,6 +70,18 @@ public class MainViewModel extends AndroidViewModel
 
     private void getAllMemo() {
         appRepository.getAllMemo(MainViewModel.this);
+    }
+
+    public void addImages(List<ImageData> imageDataList) {
+        Memo memo = this.currentMemoMutableData.getValue();
+        if (memo != null) {
+            List<ImageData> memoImageDataList = memo.getImageDataList();
+            if (memoImageDataList == null) memoImageDataList = new ArrayList<>();
+            memoImageDataList.addAll(imageDataList);
+
+            memo.setImageDataList(memoImageDataList);
+        }
+        this.currentMemoMutableData.setValue(memo);
     }
 
     public void saveMemo(String title, String content) {

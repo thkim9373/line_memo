@@ -60,6 +60,9 @@ public class MemoAdapter extends RecyclerView.Adapter {
 
     private class ItemHolder extends RecyclerView.ViewHolder {
 
+        private final int MODE_DEFAULT = 0;
+        private final int MODE_DELETE = 1;
+
         private ItemMemoListBinding binding;
 
         ItemHolder(@NonNull View itemView) {

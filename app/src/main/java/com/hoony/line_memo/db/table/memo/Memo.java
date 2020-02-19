@@ -3,14 +3,21 @@ package com.hoony.line_memo.db.table.memo;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+
+import com.hoony.line_memo.db.pojo.ImageData;
+import com.hoony.line_memo.db.util.Converters;
+
+import java.util.List;
 
 @Entity(tableName = "memo")
 public class Memo {
-    @NonNull
+
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    private int id;
+    private int id = 1;
 
     @ColumnInfo(name = "title")
     private String title;
@@ -20,6 +27,22 @@ public class Memo {
 
     @ColumnInfo(name = "content")
     private String content;
+
+    @ColumnInfo(name = "image_list")
+    @TypeConverters(Converters.class)
+    private List<ImageData> imageDataList;
+
+    public Memo() {
+
+    }
+
+    @Ignore
+    public Memo(String title, String date, String content, List<ImageData> imageDataList) {
+        this.title = title;
+        this.date = date;
+        this.content = content;
+        this.imageDataList = imageDataList;
+    }
 
     public int getId() {
         return id;
@@ -53,6 +76,14 @@ public class Memo {
         this.content = content;
     }
 
+    public List<ImageData> getImageDataList() {
+        return imageDataList;
+    }
+
+    public void setImageDataList(List<ImageData> imageDataList) {
+        this.imageDataList = imageDataList;
+    }
+
     @NonNull
     @Override
     public String toString() {
@@ -61,6 +92,7 @@ public class Memo {
                 ", title='" + title + '\'' +
                 ", date='" + date + '\'' +
                 ", content='" + content + '\'' +
+                ", imageDataList=" + imageDataList +
                 '}';
     }
 }

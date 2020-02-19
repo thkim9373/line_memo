@@ -36,25 +36,37 @@
                         android:importantForAutofill="no"
                         android:inputType="text"
                         android:textColor="@color/WHITE"
+                        android:textSize="18sp"
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <Button
-                        android:id="@+id/bt_save"
-                        style="?android:attr/borderlessButtonStyle"
+                    <ImageButton
+                        android:id="@+id/ib_save"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
-                        android:background="@drawable/ripple_save_button"
-                        android:elevation="0dp"
-                        android:text="@string/save"
-                        android:textColor="@color/WHITE"
-                        android:textStyle="bold"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_save_white_24dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="ContentDescription" />
+
+                    <ImageButton
+                        android:id="@+id/ib_add_photo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_add_a_photo_white_24dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/ib_save"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="ContentDescription" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -64,39 +76,13 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_image"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:padding="8dp"
             app:layout_constraintDimensionRatio="h, 4:1"
-            app:layout_constraintEnd_toStartOf="@id/cl_add_image_layout"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/app_bar_layout" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_add_image_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:background="?attr/selectableItemBackground"
-            app:layout_constraintBottom_toBottomOf="@id/rv_image"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/rv_image">
-
-            <Button
-                android:id="@+id/tv_add_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:drawableTop="@drawable/ic_add_circle_blue_grey_300_24dp"
-                android:gravity="center"
-                android:padding="8dp"
-                android:text="@string/add_image"
-                android:textColor="@color/blue_grey"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ScrollView
             android:id="@+id/sv_edit_text"
@@ -116,6 +102,7 @@
                 android:importantForAutofill="no"
                 android:inputType="textMultiLine"
                 android:padding="8dp"
+                android:textSize="18sp"
                 tools:ignore="LabelFor" />
 
         </ScrollView>

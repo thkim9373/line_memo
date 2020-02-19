@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_note_container"
+        android:id="@+id/cl_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:context=".gallery.GalleryActivity">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar_layout"
@@ -27,30 +28,38 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <TextView
-                        android:id="@+id/tv_title"
-                        android:layout_width="200dp"
+                        android:id="@+id/et_title"
+                        style="@style/AppBarTitle"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:textColor="@color/WHITE"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
+                        android:text="@string/take_photos"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:text="@string/title" />
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <ImageButton
-                        android:id="@+id/ib_edit"
-                        style="?android:attr/borderlessButtonStyle"
+                        android:id="@+id/ib_done"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
-                        android:background="@drawable/ripple_save_button"
-                        android:src="@drawable/ic_border_color_white_24dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_done_white_24dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:ignore="ContentDescription" />
+
+                    <TextView
+                        android:id="@+id/ib_add_photo"
+                        style="@style/AppBarSubTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/ib_done"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="총 10장" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -59,34 +68,11 @@
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_image"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:padding="8dp"
-            app:layout_constraintDimensionRatio="h, 4:1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/app_bar_layout" />
-
-        <ScrollView
-            android:id="@+id/sv_content"
+            android:id="@+id/rv_grid"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:fillViewport="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rv_image">
-
-            <TextView
-                android:id="@+id/tv_content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:gravity="top"
-                android:padding="8dp"
-                android:textSize="18sp"
-                tools:text="@string/please_input_content" />
-
-        </ScrollView>
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/app_bar_layout"
+            tools:listitem="@layout/item_photo_grid" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

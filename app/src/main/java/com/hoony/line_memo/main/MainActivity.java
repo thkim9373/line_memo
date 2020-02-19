@@ -3,15 +3,6 @@ package com.hoony.line_memo.main;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.hoony.line_memo.R;
-import com.hoony.line_memo.databinding.ActivityMainBinding;
-import com.hoony.line_memo.main.fragments.MemoReadFragment;
-import com.hoony.line_memo.main.fragments.MemoWriteFragment;
-import com.hoony.line_memo.main.fragments.list.MemoListFragment;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -20,16 +11,24 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
-public class MainActivity extends AppCompatActivity {
+import com.hoony.line_memo.R;
+import com.hoony.line_memo.databinding.ActivityMainBinding;
+import com.hoony.line_memo.main.fragments.MemoReadFragment;
+import com.hoony.line_memo.main.fragments.write.MemoWriteFragment;
+import com.hoony.line_memo.main.fragments.list.MemoListFragment;
 
-    public static final int FRAGMENT_LIST = 0;
-    public static final int FRAGMENT_READ = 1;
-    public static final int FRAGMENT_WRITE = 2;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.hoony.line_memo.main.MainViewModel.FRAGMENT_LIST;
+import static com.hoony.line_memo.main.MainViewModel.FRAGMENT_READ;
+import static com.hoony.line_memo.main.MainViewModel.FRAGMENT_WRITE;
+
+public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
     MainViewModel viewModel;
     List<Fragment> fragmentList = new ArrayList<>();
-    private int currentFragmentIndex = FRAGMENT_LIST;
     private long backKeyPressedTime = 0;
     private Toast mToast;
 
@@ -37,17 +36,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(MainActivity.this, R.layout.activity_main);
-        viewModel = new ViewModelProvider(MainActivity.this).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(MainActivity.this, ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication())).get(MainViewModel.class);
 
         fragmentList.add(new MemoListFragment());
         fragmentList.add(new MemoReadFragment());
         fragmentList.add(new MemoWriteFragment());
 
-        replaceFragment(FRAGMENT_LIST);
+        setObserve();
+    }
+
+    private void setObserve() {
+        viewModel.getFragmentIndex().observe(MainActivity.this, this::replaceFragment);
     }
 
     public void replaceFragment(int fragmentIndex) {
-        currentFragmentIndex = fragmentIndex;
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(binding.flMain.getId(), this.fragmentList.get(fragmentIndex)).commit();
@@ -55,7 +57,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        switch (currentFragmentIndex) {
+        int fragmentIndex = viewModel.getFragmentIndex().getValue() != null ?
+                viewModel.getFragmentIndex().getValue() : -1;
+        switch (fragmentIndex) {
             case FRAGMENT_LIST:
                 if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
                     backKeyPressedTime = System.currentTimeMillis();
@@ -65,10 +69,10 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case FRAGMENT_READ:
-                replaceFragment(FRAGMENT_LIST);
+                viewModel.setFragmentIndex(FRAGMENT_LIST);
                 break;
             case FRAGMENT_WRITE:
-                replaceFragment(FRAGMENT_LIST);
+                viewModel.setFragmentIndex(FRAGMENT_LIST);
                 break;
         }
     }

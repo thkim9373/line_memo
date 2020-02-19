@@ -5,4 +5,10 @@
     <string name="save">저장</string>
     <string name="add_image">사진 추가</string>
     <string name="please_input_content">내용을 입력하세요.</string>
+
+    <string name="camera">카메라</string>
+    <string name="gallery">갤러리</string>
+    <string name="url">URL</string>
+
+    <string name="take_photos">사진 선택</string>
 </resources>

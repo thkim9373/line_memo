@@ -5,17 +5,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.hoony.line_memo.R;
-import com.hoony.line_memo.databinding.FragmentMemoListBinding;
-import com.hoony.line_memo.main.MainActivity;
-import com.hoony.line_memo.main.MainViewModel;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
+
+import com.hoony.line_memo.R;
+import com.hoony.line_memo.databinding.FragmentMemoListBinding;
+import com.hoony.line_memo.main.MainViewModel;
 
 public class MemoListFragment extends Fragment implements View.OnClickListener, MemoAdapter.onItemClickListener {
 
@@ -40,7 +39,7 @@ public class MemoListFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity(), ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().getApplication())).get(MainViewModel.class);
         setObserve();
     }
 
@@ -70,13 +69,13 @@ public class MemoListFragment extends Fragment implements View.OnClickListener, 
     public void onClick(View view) {
         if (view.getId() == R.id.fab_create_memo) {
             viewModel.getCurrentMemoMutableData().setValue(null);
-            ((MainActivity) requireActivity()).replaceFragment(MainActivity.FRAGMENT_WRITE);
+            viewModel.setFragmentIndex(MainViewModel.FRAGMENT_WRITE);
         }
     }
 
     @Override
     public void onItemClick(int position) {
         viewModel.setCurrentMemoMutableData(position);
-        ((MainActivity) requireActivity()).replaceFragment(MainActivity.FRAGMENT_READ);
+        viewModel.setFragmentIndex(MainViewModel.FRAGMENT_READ);
     }
 }

@@ -5,16 +5,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.hoony.line_memo.R;
-import com.hoony.line_memo.databinding.FragmentMemoReadBinding;
-import com.hoony.line_memo.main.MainActivity;
-import com.hoony.line_memo.main.MainViewModel;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
+import com.hoony.line_memo.R;
+import com.hoony.line_memo.databinding.FragmentMemoReadBinding;
+import com.hoony.line_memo.main.MainViewModel;
 
 public class MemoReadFragment extends Fragment implements View.OnClickListener {
 
@@ -38,7 +37,7 @@ public class MemoReadFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity(), ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().getApplication())).get(MainViewModel.class);
         setObserve();
     }
 
@@ -55,6 +54,9 @@ public class MemoReadFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        ((MainActivity) requireActivity()).replaceFragment(MainActivity.FRAGMENT_WRITE);
+        if(view.getId() == R.id.ib_edit) {
+            viewModel.setFragmentIndex(MainViewModel.FRAGMENT_WRITE);
+        }
+//        ((MainActivity) requireActivity()).replaceFragment(MainActivity.FRAGMENT_WRITE);
     }
 }
