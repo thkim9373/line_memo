@@ -1,6 +1,5 @@
 package com.hoony.line_memo.db.pojo;
 
-import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -11,23 +10,16 @@ public class ImageData implements Parcelable {
     public static final int URL = 2;
 
     private int kind;
-    private Uri uri;
-    private String Name;
+    private String uriPath;
 
-    public ImageData(int kind, Uri uri) {
+    public ImageData(int kind, String uriPath) {
         this.kind = kind;
-        this.uri = uri;
+        this.uriPath = uriPath;
     }
 
-    ImageData(Uri uri, String name) {
-        this.uri = uri;
-        Name = name;
-    }
-
-    private ImageData(Parcel in) {
+    protected ImageData(Parcel in) {
         kind = in.readInt();
-        uri = in.readParcelable(Uri.class.getClassLoader());
-        Name = in.readString();
+        uriPath = in.readString();
     }
 
     public static final Creator<ImageData> CREATOR = new Creator<ImageData>() {
@@ -50,20 +42,12 @@ public class ImageData implements Parcelable {
         this.kind = kind;
     }
 
-    public Uri getUri() {
-        return uri;
+    public String getUriPath() {
+        return uriPath;
     }
 
-    public void setUri(Uri uri) {
-        this.uri = uri;
-    }
-
-    public String getName() {
-        return Name;
-    }
-
-    public void setName(String name) {
-        Name = name;
+    public void setUriPath(String uriPath) {
+        this.uriPath = uriPath;
     }
 
     @Override
@@ -72,9 +56,8 @@ public class ImageData implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(kind);
-        dest.writeParcelable(uri, flags);
-        dest.writeString(Name);
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(kind);
+        parcel.writeString(uriPath);
     }
 }

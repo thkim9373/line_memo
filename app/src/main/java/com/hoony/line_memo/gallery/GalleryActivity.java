@@ -10,6 +10,13 @@ import android.os.Parcelable;
 import android.provider.Settings;
 import android.view.View;
 
+import com.hoony.line_memo.R;
+import com.hoony.line_memo.databinding.ActivityPhotoGridViewBinding;
+import com.hoony.line_memo.db.pojo.ImageData;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -17,13 +24,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
-
-import com.hoony.line_memo.R;
-import com.hoony.line_memo.databinding.ActivityPhotoGridViewBinding;
-import com.hoony.line_memo.db.pojo.ImageData;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GalleryActivity extends AppCompatActivity implements View.OnClickListener, GalleryAdapter.onItemClickListener {
 
@@ -59,9 +59,10 @@ public class GalleryActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void setObserve() {
-        viewModel.getImageDateListMutableData().observe(GalleryActivity.this, imageDataList -> {
-            binding.rvGrid.setAdapter(new GalleryAdapter(imageDataList, GalleryActivity.this));
-        });
+        viewModel.getImageDateListMutableData().observe(
+                GalleryActivity.this,
+                imageDataList -> binding.rvGrid.setAdapter(new GalleryAdapter(imageDataList, GalleryActivity.this))
+        );
     }
 
     private boolean isPermissionsDenied() {

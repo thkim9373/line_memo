@@ -1,16 +1,14 @@
 package com.hoony.line_memo.db.table.memo;
 
+import com.hoony.line_memo.db.pojo.ImageData;
+
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import androidx.room.TypeConverters;
-
-import com.hoony.line_memo.db.pojo.ImageData;
-import com.hoony.line_memo.db.util.Converters;
-
-import java.util.List;
 
 @Entity(tableName = "memo")
 public class Memo {
@@ -29,7 +27,6 @@ public class Memo {
     private String content;
 
     @ColumnInfo(name = "image_list")
-    @TypeConverters(Converters.class)
     private List<ImageData> imageDataList;
 
     public Memo() {

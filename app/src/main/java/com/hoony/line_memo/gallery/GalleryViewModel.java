@@ -5,14 +5,14 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.MutableLiveData;
-
 import com.hoony.line_memo.db.pojo.ImageData;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
 
 public class GalleryViewModel extends AndroidViewModel {
 
@@ -69,7 +69,7 @@ public class GalleryViewModel extends AndroidViewModel {
                             Uri.withAppendedPath(
                                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                                     String.valueOf(cursor.getLong(idColumn))
-                            )
+                            ).toString()
                     )
             );
         }

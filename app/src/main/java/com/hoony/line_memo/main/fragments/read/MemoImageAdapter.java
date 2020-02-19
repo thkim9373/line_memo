@@ -1,4 +1,4 @@
-package com.hoony.line_memo.main.fragments.write;
+package com.hoony.line_memo.main.fragments.read;
 
 import android.content.Context;
 import android.net.Uri;
@@ -20,20 +20,14 @@ import androidx.recyclerview.widget.RecyclerView;
 public class MemoImageAdapter extends RecyclerView.Adapter {
 
     private List<ImageData> mList;
-    private MemoImageAdapterListener mListener;
     private Context mContext;
 
-    public MemoImageAdapter(List<ImageData> mList, MemoImageAdapterListener listener) {
+    MemoImageAdapter(List<ImageData> mList) {
         this.mList = mList;
-        this.mListener = listener;
     }
 
-    public void setImageDataList(List<ImageData> imageDataList) {
+    void setImageDataList(List<ImageData> imageDataList) {
         this.mList = imageDataList;
-    }
-
-    interface MemoImageAdapterListener {
-        void onItemClick(int position);
     }
 
     @NonNull
@@ -77,14 +71,6 @@ public class MemoImageAdapter extends RecyclerView.Adapter {
         ItemHolder(@NonNull View itemView) {
             super(itemView);
             binding = DataBindingUtil.bind(itemView);
-            if (binding != null) {
-                binding.ivPhoto.setOnClickListener(view -> {
-                    int position = getAdapterPosition();
-                    if (mListener != null && position != RecyclerView.NO_POSITION) {
-                        mListener.onItemClick(position);
-                    }
-                });
-            }
         }
 
         ItemPhotoMemoBinding getBinding() {

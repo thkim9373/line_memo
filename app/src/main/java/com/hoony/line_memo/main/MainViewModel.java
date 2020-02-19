@@ -81,7 +81,7 @@ public class MainViewModel extends AndroidViewModel
 
             memo.setImageDataList(memoImageDataList);
         }
-        this.currentMemoMutableData.setValue(memo);
+//        this.currentMemoMutableData.setValue(memo);
     }
 
     public void saveMemo(String title, String content) {
@@ -89,7 +89,9 @@ public class MainViewModel extends AndroidViewModel
         boolean isContain;
         if (currentMemoMutableData.getValue() != null) {
             memo = currentMemoMutableData.getValue();
-            isContain = true;
+
+            List<Memo> memoList = this.memoListMutableData.getValue();
+            isContain = memoList != null && memoList.contains(memo);
         } else {
             memo = new Memo();
             isContain = false;

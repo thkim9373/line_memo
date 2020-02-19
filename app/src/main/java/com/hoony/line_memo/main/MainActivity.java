@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.hoony.line_memo.R;
 import com.hoony.line_memo.databinding.ActivityMainBinding;
-import com.hoony.line_memo.main.fragments.MemoReadFragment;
+import com.hoony.line_memo.main.fragments.read.MemoReadFragment;
 import com.hoony.line_memo.main.fragments.write.MemoWriteFragment;
 import com.hoony.line_memo.main.fragments.list.MemoListFragment;
 

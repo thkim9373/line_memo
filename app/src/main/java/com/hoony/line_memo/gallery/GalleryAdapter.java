@@ -1,13 +1,10 @@
 package com.hoony.line_memo.gallery;
 
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.databinding.DataBindingUtil;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.hoony.line_memo.R;
@@ -15,6 +12,10 @@ import com.hoony.line_memo.databinding.ItemPhotoGridBinding;
 import com.hoony.line_memo.db.pojo.ImageData;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class GalleryAdapter extends RecyclerView.Adapter {
 
@@ -41,12 +42,12 @@ public class GalleryAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ItemPhotoGridBinding binding = ((ItemHolder) holder).getBinding();
-
         ImageData imageData = mList.get(position);
 
-//        binding.ivThumbnail.setImageURI(imageData.getUri());
+        Uri uri = Uri.parse(imageData.getUriPath());
+
         Glide.with(mContext)
-                .load(imageData.getUri())
+                .load(uri)
                 .thumbnail(0.3f)
                 .centerCrop()
                 .into(binding.ivPhoto);

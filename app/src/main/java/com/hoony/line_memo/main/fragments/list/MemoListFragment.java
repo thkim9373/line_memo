@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.hoony.line_memo.R;
 import com.hoony.line_memo.databinding.FragmentMemoListBinding;
+import com.hoony.line_memo.db.table.memo.Memo;
 import com.hoony.line_memo.main.MainViewModel;
 
 public class MemoListFragment extends Fragment implements View.OnClickListener, MemoAdapter.onItemClickListener {
@@ -68,7 +69,7 @@ public class MemoListFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.fab_create_memo) {
-            viewModel.getCurrentMemoMutableData().setValue(null);
+            viewModel.getCurrentMemoMutableData().setValue(new Memo());
             viewModel.setFragmentIndex(MainViewModel.FRAGMENT_WRITE);
         }
     }
