@@ -17,7 +17,7 @@ public class Memo {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    private int id = 1;
+    private int id;
 
     @ColumnInfo(name = "title")
     private String title;
