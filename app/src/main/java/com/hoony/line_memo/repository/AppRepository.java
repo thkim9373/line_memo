@@ -10,8 +10,6 @@ import com.hoony.line_memo.repository.task.GetAllMemoTask;
 import com.hoony.line_memo.repository.task.InsertMemoTask;
 import com.hoony.line_memo.repository.task.UpdateMemoTask;
 
-import java.util.List;
-
 public class AppRepository {
     private static AppRepository INSTANCE;
 

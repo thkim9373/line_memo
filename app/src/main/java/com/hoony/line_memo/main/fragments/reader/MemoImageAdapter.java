@@ -20,14 +20,20 @@ import androidx.recyclerview.widget.RecyclerView;
 public class MemoImageAdapter extends RecyclerView.Adapter {
 
     private List<ImageData> mList;
+    private final MemoImageAdapterListener mListener;
     private Context mContext;
 
-    MemoImageAdapter(List<ImageData> mList) {
+    MemoImageAdapter(List<ImageData> mList, MemoImageAdapterListener listener) {
         this.mList = mList;
+        this.mListener = listener;
     }
 
     void setImageDataList(List<ImageData> imageDataList) {
         this.mList = imageDataList;
+    }
+
+    interface MemoImageAdapterListener {
+        void onItemClick(int position);
     }
 
     @NonNull
@@ -43,20 +49,13 @@ public class MemoImageAdapter extends RecyclerView.Adapter {
 
         ImageData imageData = mList.get(position);
 
-        Uri uri;
-        switch (imageData.getKind()) {
-            case ImageData.CAMERA:
-            case ImageData.GALLERY:
-                uri = Uri.parse(imageData.getUriPath());
-                Glide.with(mContext)
-                        .load(uri)
-                        .thumbnail(0.3f)
-                        .fitCenter()
-                        .into(binding.ivPhoto);
-                break;
-            case ImageData.URL:
-                break;
-        }    }
+        Uri uri = Uri.parse(imageData.getUriPath());
+        Glide.with(mContext)
+                .load(uri)
+                .thumbnail(0.3f)
+                .fitCenter()
+                .into(binding.ivPhoto);
+    }
 
     @Override
     public int getItemCount() {
@@ -70,6 +69,14 @@ public class MemoImageAdapter extends RecyclerView.Adapter {
         ItemHolder(@NonNull View itemView) {
             super(itemView);
             binding = DataBindingUtil.bind(itemView);
+            if (binding != null) {
+                binding.ivPhoto.setOnClickListener(view -> {
+                    int position = getAdapterPosition();
+                    if (mListener != null && position != RecyclerView.NO_POSITION) {
+                        mListener.onItemClick(position);
+                    }
+                });
+            }
         }
 
         ItemPhotoMemoBinding getBinding() {

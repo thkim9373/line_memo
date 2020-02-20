@@ -1,10 +1,12 @@
 package com.hoony.line_memo.main.fragments.reader;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
 import com.hoony.line_memo.R;
 import com.hoony.line_memo.databinding.FragmentMemoReadBinding;
 import com.hoony.line_memo.main.MainViewModel;
@@ -17,7 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class MemoReaderFragment extends Fragment implements View.OnClickListener {
+public class MemoReaderFragment extends Fragment implements View.OnClickListener, MemoImageAdapter.MemoImageAdapterListener {
 
     private FragmentMemoReadBinding binding;
     private MainViewModel viewModel;
@@ -39,6 +41,7 @@ public class MemoReaderFragment extends Fragment implements View.OnClickListener
 
     private void setListener() {
         binding.ibEdit.setOnClickListener(MemoReaderFragment.this);
+        binding.ibImageClose.setOnClickListener(MemoReaderFragment.this);
     }
 
     private void setRecyclerView() {
@@ -61,7 +64,7 @@ public class MemoReaderFragment extends Fragment implements View.OnClickListener
             if (memo.getImageDataList() != null) {
                 MemoImageAdapter adapter = (MemoImageAdapter) binding.rvImage.getAdapter();
                 if (adapter == null) {
-                    adapter = new MemoImageAdapter(memo.getImageDataList());
+                    adapter = new MemoImageAdapter(memo.getImageDataList(), MemoReaderFragment.this);
                     binding.rvImage.setAdapter(adapter);
                 } else {
                     adapter.setImageDataList(memo.getImageDataList());
@@ -77,11 +80,29 @@ public class MemoReaderFragment extends Fragment implements View.OnClickListener
         if (view.getId() == R.id.ib_edit) {
             viewModel.initEditMemoMutableData();
             viewModel.setFragmentIndex(MainViewModel.FRAGMENT_WRITE);
+        } else if (view.getId() == R.id.ib_image_close) {
+            binding.clSelectedImageContainer.setVisibility(View.INVISIBLE);
         }
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        String UriPath = viewModel.getSelectedImageUri(position);
+
+        binding.clSelectedImageContainer.setVisibility(View.VISIBLE);
+
+        Uri uri = Uri.parse(UriPath);
+
+        Glide.with(MemoReaderFragment.this)
+                .load(uri)
+                .thumbnail(0.3f)
+                .fitCenter()
+                .into(binding.ivSelectedImage);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        binding.clSelectedImageContainer.setVisibility(View.INVISIBLE);
     }
 }

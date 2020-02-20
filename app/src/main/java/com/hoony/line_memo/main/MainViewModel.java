@@ -67,6 +67,13 @@ public class MainViewModel extends AndroidViewModel
         return editMemoMutableData;
     }
 
+    public String getSelectedImageUri(int position) {
+        Memo memo = this.readMemoMutableData.getValue();
+        if(memo == null) return null;
+
+        return memo.getImageDataList().get(position).getUriPath();
+    }
+
     public void initEditMemoMutableData() {
         Memo editMemo = new Memo();
 

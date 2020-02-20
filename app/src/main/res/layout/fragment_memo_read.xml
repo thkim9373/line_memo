@@ -88,5 +88,33 @@
 
         </ScrollView>
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_selected_image_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/image_background"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rv_image">
+
+            <ImageView
+                android:id="@+id/iv_selected_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:ignore="ContentDescription" />
+
+            <ImageButton
+                android:id="@+id/ib_image_close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                android:src="@drawable/ic_close_white_48dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="ContentDescription" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

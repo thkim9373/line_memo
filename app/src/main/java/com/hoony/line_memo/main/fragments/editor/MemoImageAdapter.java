@@ -6,16 +6,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-import androidx.databinding.DataBindingUtil;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.hoony.line_memo.R;
-import com.hoony.line_memo.databinding.ItemPhotoWriteBinding;
+import com.hoony.line_memo.databinding.ItemPhotoEditorBinding;
 import com.hoony.line_memo.db.pojo.ImageData;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class MemoImageAdapter extends RecyclerView.Adapter {
 
@@ -50,28 +50,21 @@ public class MemoImageAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (mContext == null) mContext = parent.getContext();
-        return new ItemHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_photo_write, parent, false));
+        return new ItemHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_photo_editor, parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        ItemPhotoWriteBinding binding = ((ItemHolder) holder).getBinding();
+        ItemPhotoEditorBinding binding = ((ItemHolder) holder).getBinding();
 
         ImageData imageData = mList.get(position);
-        Uri uri;
-        switch (imageData.getKind()) {
-            case ImageData.CAMERA:
-            case ImageData.GALLERY:
-                uri = Uri.parse(imageData.getUriPath());
-                Glide.with(mContext)
-                        .load(uri)
-                        .thumbnail(0.3f)
-                        .fitCenter()
-                        .into(binding.ivPhoto);
-                break;
-            case ImageData.URL:
-                break;
-        }
+
+        Uri uri = Uri.parse(imageData.getUriPath());
+        Glide.with(mContext)
+                .load(uri)
+                .thumbnail(0.3f)
+                .fitCenter()
+                .into(binding.ivPhoto);
     }
 
     @Override
@@ -81,7 +74,7 @@ public class MemoImageAdapter extends RecyclerView.Adapter {
 
     private class ItemHolder extends RecyclerView.ViewHolder {
 
-        private ItemPhotoWriteBinding binding;
+        private ItemPhotoEditorBinding binding;
 
         ItemHolder(@NonNull View itemView) {
             super(itemView);
@@ -100,7 +93,7 @@ public class MemoImageAdapter extends RecyclerView.Adapter {
             }
         }
 
-        ItemPhotoWriteBinding getBinding() {
+        ItemPhotoEditorBinding getBinding() {
             return binding;
         }
     }

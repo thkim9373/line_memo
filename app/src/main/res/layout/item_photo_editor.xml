@@ -9,7 +9,7 @@
         android:padding="2dp">
 
         <ImageView
-            android:background="#bbbbbbbb"
+            android:background="@color/image_background"
             android:id="@+id/iv_photo"
             android:layout_width="0dp"
             android:layout_height="0dp"

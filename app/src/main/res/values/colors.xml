@@ -150,4 +150,5 @@
     <color name="colorPrimaryDark">#009c00</color>
     <color name="colorAccent">#79ff4c</color>
     <color name="blue_grey">#90A4AE</color>
+    <color name="image_background">#aa000000</color>
 </resources>

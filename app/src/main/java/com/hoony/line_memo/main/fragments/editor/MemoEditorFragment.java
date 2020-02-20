@@ -1,28 +1,18 @@
 package com.hoony.line_memo.main.fragments.editor;
 
-import android.content.ContentResolver;
-import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import android.widget.EditText;
 
 import com.hoony.line_memo.R;
 import com.hoony.line_memo.databinding.FragmentMemoEditBinding;
@@ -36,6 +26,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class MemoEditorFragment extends Fragment
         implements View.OnClickListener,
@@ -194,6 +195,38 @@ public class MemoEditorFragment extends Fragment
     @Override
     public void onUrlClick() {
 
+        //  출처 : https://stackoverflow.com/questions/10903754/input-text-dialog-android
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("URL 입력");
+
+        // Set up the input
+        final EditText editText = new EditText(requireContext());
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        editText.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(editText);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String input = editText.getText().toString();
+                viewModel.addImages(new ImageData(ImageData.URL, Uri.parse(input).toString()));
+
+                MemoImageAdapter memoImageAdapter = (MemoImageAdapter) binding.rvImage.getAdapter();
+                if (memoImageAdapter != null) {
+                    int itemCount = memoImageAdapter.getItemCount();
+                    memoImageAdapter.notifyItemInserted(itemCount - 1);
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 
     @Override
