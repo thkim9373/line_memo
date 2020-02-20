@@ -1,4 +1,4 @@
-package com.hoony.line_memo.main.fragments.write;
+package com.hoony.line_memo.main.fragments.editor;
 
 import android.content.Context;
 import android.view.View;

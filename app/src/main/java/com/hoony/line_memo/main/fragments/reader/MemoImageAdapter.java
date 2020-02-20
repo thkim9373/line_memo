@@ -1,4 +1,4 @@
-package com.hoony.line_memo.main.fragments.read;
+package com.hoony.line_memo.main.fragments.reader;
 
 import android.content.Context;
 import android.net.Uri;
@@ -43,11 +43,11 @@ public class MemoImageAdapter extends RecyclerView.Adapter {
 
         ImageData imageData = mList.get(position);
 
+        Uri uri;
         switch (imageData.getKind()) {
             case ImageData.CAMERA:
-                break;
             case ImageData.GALLERY:
-                Uri uri = Uri.parse(imageData.getUriPath());
+                uri = Uri.parse(imageData.getUriPath());
                 Glide.with(mContext)
                         .load(uri)
                         .thumbnail(0.3f)
@@ -56,8 +56,7 @@ public class MemoImageAdapter extends RecyclerView.Adapter {
                 break;
             case ImageData.URL:
                 break;
-        }
-    }
+        }    }
 
     @Override
     public int getItemCount() {

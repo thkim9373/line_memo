@@ -1,4 +1,4 @@
-package com.hoony.line_memo.main.fragments.read;
+package com.hoony.line_memo.main.fragments.reader;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,7 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class MemoReadFragment extends Fragment implements View.OnClickListener {
+public class MemoReaderFragment extends Fragment implements View.OnClickListener {
 
     private FragmentMemoReadBinding binding;
     private MainViewModel viewModel;
@@ -38,7 +38,7 @@ public class MemoReadFragment extends Fragment implements View.OnClickListener {
     }
 
     private void setListener() {
-        binding.ibEdit.setOnClickListener(MemoReadFragment.this);
+        binding.ibEdit.setOnClickListener(MemoReaderFragment.this);
     }
 
     private void setRecyclerView() {
@@ -53,7 +53,7 @@ public class MemoReadFragment extends Fragment implements View.OnClickListener {
     }
 
     private void setObserve() {
-        viewModel.getCurrentMemoMutableData().observe(getViewLifecycleOwner(), memo -> {
+        viewModel.getReadMemoMutableData().observe(getViewLifecycleOwner(), memo -> {
 
             binding.tvTitle.setText(memo.getTitle());
             binding.tvContent.setText(memo.getContent());
@@ -75,8 +75,13 @@ public class MemoReadFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.ib_edit) {
+            viewModel.initEditMemoMutableData();
             viewModel.setFragmentIndex(MainViewModel.FRAGMENT_WRITE);
         }
-//        ((MainActivity) requireActivity()).replaceFragment(MainActivity.FRAGMENT_WRITE);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
     }
 }

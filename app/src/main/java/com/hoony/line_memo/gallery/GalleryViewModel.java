@@ -5,14 +5,15 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 
-import com.hoony.line_memo.db.pojo.ImageData;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
+
+import com.hoony.line_memo.db.pojo.ImageData;
+import com.hoony.line_memo.gallery.pojo.CheckableImageData;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GalleryViewModel extends AndroidViewModel {
 
@@ -35,36 +36,30 @@ public class GalleryViewModel extends AndroidViewModel {
                 MediaStore.Images.Media.DATE_ADDED + " DESC"
         );
         if (cursor != null) {
-            List<ImageData> imageDataList = getImageDataListFromCursor(cursor);
+            List<CheckableImageData> imageDataList = getImageDataListFromCursor(cursor);
             setImageDateListMutableData(imageDataList);
             cursor.close();
         }
     }
 
-    private MutableLiveData<List<ImageData>> imageDateListMutableData = new MutableLiveData<>();
+    private MutableLiveData<List<CheckableImageData>> imageDateListMutableData = new MutableLiveData<>();
 
-    private MutableLiveData<List<ImageData>> selectedImageDataMutableData = new MutableLiveData<>();
-
-    MutableLiveData<List<ImageData>> getImageDateListMutableData() {
+    MutableLiveData<List<CheckableImageData>> getImageDateListMutableData() {
         return imageDateListMutableData;
     }
 
-    MutableLiveData<List<ImageData>> getSelectedImageDataMutableData() {
-        return selectedImageDataMutableData;
-    }
-
-    private void setImageDateListMutableData(List<ImageData> imageDataList) {
+    private void setImageDateListMutableData(List<CheckableImageData> imageDataList) {
         this.imageDateListMutableData.setValue(imageDataList);
     }
 
-    private List<ImageData> getImageDataListFromCursor(Cursor cursor) {
-        List<ImageData> result = new ArrayList<>();
+    private List<CheckableImageData> getImageDataListFromCursor(Cursor cursor) {
+        List<CheckableImageData> result = new ArrayList<>();
 
         int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
 
         while (cursor.moveToNext()) {
             result.add(
-                    new ImageData(
+                    new CheckableImageData(
                             ImageData.GALLERY,
                             Uri.withAppendedPath(
                                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
@@ -75,17 +70,6 @@ public class GalleryViewModel extends AndroidViewModel {
         }
 
         return result;
-    }
-
-    void addSelectedItem(int position) {
-        if (this.imageDateListMutableData.getValue() != null) {
-            ImageData selectedImageData = this.imageDateListMutableData.getValue().get(position);
-
-            if (this.selectedImageDataMutableData.getValue() == null) {
-                this.selectedImageDataMutableData.setValue(new ArrayList<>());
-            }
-            this.selectedImageDataMutableData.getValue().add(selectedImageData);
-        }
     }
 
     @Override

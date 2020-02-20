@@ -3,17 +3,16 @@ package com.hoony.line_memo.repository.task;
 import com.hoony.line_memo.db.table.memo.Memo;
 import com.hoony.line_memo.db.table.memo.MemoDao;
 
-import java.util.List;
 import java.util.concurrent.Callable;
 
 public class DeleteMemoTask implements Callable {
 
     private final MemoDao memoDao;
-    private final List<Memo> memoList;
+    private final Memo memo;
 
-    public DeleteMemoTask(MemoDao memoDao, List<Memo> memoList) {
+    public DeleteMemoTask(MemoDao memoDao, Memo memo) {
         this.memoDao = memoDao;
-        this.memoList = memoList;
+        this.memo = memo;
     }
 
     public interface DeleteMemoTaskCallback {
@@ -24,7 +23,7 @@ public class DeleteMemoTask implements Callable {
 
     @Override
     public Object call() {
-        memoDao.deleteAll(memoList);
+        memoDao.delete(memo);
         return null;
     }
 }

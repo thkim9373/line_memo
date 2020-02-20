@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -14,7 +15,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.hoony.line_memo.R;
 import com.hoony.line_memo.databinding.FragmentMemoListBinding;
-import com.hoony.line_memo.db.table.memo.Memo;
 import com.hoony.line_memo.main.MainViewModel;
 
 public class MemoListFragment extends Fragment implements View.OnClickListener, MemoAdapter.onItemClickListener {
@@ -69,14 +69,26 @@ public class MemoListFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.fab_create_memo) {
-            viewModel.getCurrentMemoMutableData().setValue(new Memo());
+            viewModel.createEditMemoMutableData();
             viewModel.setFragmentIndex(MainViewModel.FRAGMENT_WRITE);
         }
     }
 
     @Override
     public void onItemClick(int position) {
-        viewModel.setCurrentMemoMutableData(position);
+        viewModel.setReadMemoMutableData(position);
         viewModel.setFragmentIndex(MainViewModel.FRAGMENT_READ);
+    }
+
+    @Override
+    public void onItemLongClick(int position) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("메모 삭제")
+                .setMessage("메모를 삭제하시겠습니까?")
+                .setPositiveButton("확인", (dialog, which) -> {
+                    viewModel.deleteMemo(position);
+                })
+                .setNegativeButton("취소", null)
+                .show();
     }
 }

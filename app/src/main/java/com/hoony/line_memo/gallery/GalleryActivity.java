@@ -10,13 +10,6 @@ import android.os.Parcelable;
 import android.provider.Settings;
 import android.view.View;
 
-import com.hoony.line_memo.R;
-import com.hoony.line_memo.databinding.ActivityPhotoGridViewBinding;
-import com.hoony.line_memo.db.pojo.ImageData;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -25,7 +18,15 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
-public class GalleryActivity extends AppCompatActivity implements View.OnClickListener, GalleryAdapter.onItemClickListener {
+import com.hoony.line_memo.R;
+import com.hoony.line_memo.databinding.ActivityPhotoGridViewBinding;
+import com.hoony.line_memo.db.pojo.ImageData;
+import com.hoony.line_memo.gallery.pojo.CheckableImageData;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class GalleryActivity extends AppCompatActivity implements View.OnClickListener {
 
     private final String[] PERMISSIONS = {Manifest.permission.READ_EXTERNAL_STORAGE};
 
@@ -61,7 +62,7 @@ public class GalleryActivity extends AppCompatActivity implements View.OnClickLi
     private void setObserve() {
         viewModel.getImageDateListMutableData().observe(
                 GalleryActivity.this,
-                imageDataList -> binding.rvGrid.setAdapter(new GalleryAdapter(imageDataList, GalleryActivity.this))
+                imageDataList -> binding.rvGrid.setAdapter(new GalleryAdapter(imageDataList))
         );
     }
 
@@ -76,16 +77,18 @@ public class GalleryActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
-    public void onItemClick(int position) {
-        viewModel.addSelectedItem(position);
-    }
-
-    @Override
     public void onClick(View v) {
         if (v.getId() == R.id.ib_done) {
-            List<ImageData> imageDataList = viewModel.getSelectedImageDataMutableData().getValue();
+            List<CheckableImageData> checkableImageDataList = viewModel.getImageDateListMutableData().getValue();
 
-            if (imageDataList != null && imageDataList.size() != 0) {
+            if (checkableImageDataList != null && checkableImageDataList.size() != 0) {
+                List<ImageData> imageDataList = new ArrayList<>();
+
+                for (CheckableImageData checkableImageData : checkableImageDataList) {
+                    if (checkableImageData.isChecked())
+                        imageDataList.add(new ImageData(checkableImageData.getKind(), checkableImageData.getUriPath()));
+                }
+
                 Intent intent = new Intent();
                 intent.putParcelableArrayListExtra("image_data_list", (ArrayList<? extends Parcelable>) imageDataList);
                 setResult(RESULT_OK, intent);

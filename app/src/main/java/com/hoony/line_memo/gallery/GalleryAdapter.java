@@ -6,30 +6,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
-import com.hoony.line_memo.R;
-import com.hoony.line_memo.databinding.ItemPhotoGridBinding;
-import com.hoony.line_memo.db.pojo.ImageData;
-
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.hoony.line_memo.R;
+import com.hoony.line_memo.databinding.ItemPhotoGridBinding;
+import com.hoony.line_memo.gallery.pojo.CheckableImageData;
+
+import java.util.List;
+
 public class GalleryAdapter extends RecyclerView.Adapter {
 
-    private final List<ImageData> mList;
-    private final onItemClickListener itemClickListener;
+    private final List<CheckableImageData> mList;
     private Context mContext;
 
-    GalleryAdapter(List<ImageData> mList, onItemClickListener itemClickListener) {
-        this.mList = mList;
-        this.itemClickListener = itemClickListener;
-    }
-
-    interface onItemClickListener {
-        void onItemClick(int position);
+    GalleryAdapter(List<CheckableImageData> checkableImageDataList) {
+        this.mList = checkableImageDataList;
     }
 
     @NonNull
@@ -42,7 +36,7 @@ public class GalleryAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ItemPhotoGridBinding binding = ((ItemHolder) holder).getBinding();
-        ImageData imageData = mList.get(position);
+        CheckableImageData imageData = mList.get(position);
 
         Uri uri = Uri.parse(imageData.getUriPath());
 
@@ -51,6 +45,12 @@ public class GalleryAdapter extends RecyclerView.Adapter {
                 .thumbnail(0.3f)
                 .centerCrop()
                 .into(binding.ivPhoto);
+
+        if (imageData.isChecked()) {
+            binding.viewCheckedFilter.setVisibility(View.VISIBLE);
+        } else {
+            binding.viewCheckedFilter.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
@@ -68,8 +68,9 @@ public class GalleryAdapter extends RecyclerView.Adapter {
             if (binding != null) {
                 binding.ivPhoto.setOnClickListener(v -> {
                     int position = getAdapterPosition();
-                    if (itemClickListener != null && position != RecyclerView.NO_POSITION) {
-                        itemClickListener.onItemClick(position);
+                    if (position != RecyclerView.NO_POSITION) {
+                        mList.get(position).toggle();
+                        notifyItemChanged(position);
                     }
                 });
             }

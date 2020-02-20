@@ -34,6 +34,8 @@ public class MemoAdapter extends RecyclerView.Adapter {
 
     interface onItemClickListener {
         void onItemClick(int position);
+
+        void onItemLongClick(int position);
     }
 
     void setItemClickListener(onItemClickListener listener) {
@@ -93,6 +95,13 @@ public class MemoAdapter extends RecyclerView.Adapter {
                     if (itemClickListener != null && position != RecyclerView.NO_POSITION) {
                         itemClickListener.onItemClick(position);
                     }
+                });
+                binding.clCardContainer.setOnLongClickListener(v -> {
+                    int position = getAdapterPosition();
+                    if (itemClickListener != null && position != RecyclerView.NO_POSITION) {
+                        itemClickListener.onItemLongClick(position);
+                    }
+                    return false;
                 });
             }
         }

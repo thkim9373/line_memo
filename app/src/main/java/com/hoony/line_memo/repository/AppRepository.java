@@ -44,8 +44,13 @@ public class AppRepository {
         taskRunner.executeUpdateMemoTaskAsync(new UpdateMemoTask(memoDao, memo), callback);
     }
 
-    public void deleteMemo(List<Memo> memoList, DeleteMemoTask.DeleteMemoTaskCallback callback) {
+    public void deleteMemo(Memo memo, DeleteMemoTask.DeleteMemoTaskCallback callback) {
         TaskRunner taskRunner = new TaskRunner();
-        taskRunner.executeDeleteMemoTaskAsync(new DeleteMemoTask(memoDao, memoList), callback);
+        taskRunner.executeDeleteMemoTaskAsync(new DeleteMemoTask(memoDao, memo), callback);
     }
+
+//    public void deleteMemo(List<Memo> memoList, DeleteMemoTask.DeleteMemoTaskCallback callback) {
+//        TaskRunner taskRunner = new TaskRunner();
+//        taskRunner.executeDeleteMemoTaskAsync(new DeleteMemoTask(memoDao, memoList), callback);
+//    }
 }

@@ -13,8 +13,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.hoony.line_memo.R;
 import com.hoony.line_memo.databinding.ActivityMainBinding;
-import com.hoony.line_memo.main.fragments.read.MemoReadFragment;
-import com.hoony.line_memo.main.fragments.write.MemoWriteFragment;
+import com.hoony.line_memo.main.fragments.reader.MemoReaderFragment;
+import com.hoony.line_memo.main.fragments.editor.MemoEditorFragment;
 import com.hoony.line_memo.main.fragments.list.MemoListFragment;
 
 import java.util.ArrayList;
@@ -39,8 +39,8 @@ public class MainActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(MainActivity.this, ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication())).get(MainViewModel.class);
 
         fragmentList.add(new MemoListFragment());
-        fragmentList.add(new MemoReadFragment());
-        fragmentList.add(new MemoWriteFragment());
+        fragmentList.add(new MemoReaderFragment());
+        fragmentList.add(new MemoEditorFragment());
 
         setObserve();
     }

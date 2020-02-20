@@ -4,31 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:padding="2dp">
 
         <ImageView
+            android:background="#bbbbbbbb"
             android:id="@+id/iv_photo"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintDimensionRatio="h, 1:1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="w, 1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription"
             tools:src="@drawable/ic_launcher_background" />
 
-        <View
-            android:id="@+id/view_checked_filter"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="#aa000000"
-            android:visibility="invisible"
+        <ImageButton
+            android:id="@+id/ib_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="2dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_cancel_red_a200_24dp"
+            app:layout_constraintEnd_toEndOf="@id/iv_photo"
             app:layout_constraintTop_toTopOf="@id/iv_photo"
-            app:layout_constraintBottom_toBottomOf="@id/iv_photo"
-            app:layout_constraintStart_toStartOf="@id/iv_photo"
-            app:layout_constraintEnd_toEndOf="@id/iv_photo" />
+            tools:ignore="ContentDescription" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

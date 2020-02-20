@@ -2,6 +2,7 @@ package com.hoony.line_memo.db.table.memo;
 
 import com.hoony.line_memo.db.pojo.ImageData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -27,7 +28,7 @@ public class Memo {
     private String content;
 
     @ColumnInfo(name = "image_list")
-    private List<ImageData> imageDataList;
+    private List<ImageData> imageDataList = new ArrayList<>();
 
     public Memo() {
 
