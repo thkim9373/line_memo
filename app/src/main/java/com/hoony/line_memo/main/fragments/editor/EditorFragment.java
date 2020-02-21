@@ -1,6 +1,5 @@
 package com.hoony.line_memo.main.fragments.editor;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -17,17 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.hoony.line_memo.R;
 import com.hoony.line_memo.databinding.FragmentMemoEditBinding;
 import com.hoony.line_memo.db.pojo.ImageData;
@@ -41,10 +29,22 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class MemoEditorFragment extends Fragment
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+public class EditorFragment extends Fragment
         implements View.OnClickListener,
         AddPhotoBottomSheetDialog.AddPhotoBottomSheetDialogListener,
-        MemoImageAdapter.MemoImageAdapterListener {
+        EditorImageAdapter.MemoImageAdapterListener {
 
     private final int REQUEST_CAMERA = 0;
     private final int REQUEST_GALLERY = 1;
@@ -52,6 +52,30 @@ public class MemoEditorFragment extends Fragment
 
     private FragmentMemoEditBinding binding;
     private MainViewModel viewModel;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (viewModel.isUpdate()) {
+                    new AlertDialog.Builder(requireContext())
+                            .setMessage("변경 사항을 저장 할까요?")
+                            .setPositiveButton("저장", (dialogInterface, i) -> {
+                                viewModel.saveMemo();
+                            })
+                            .setNeutralButton("저장 안함", (dialogInterface, i) -> viewModel.setFragmentIndex(MainViewModel.FRAGMENT_LIST)
+                            )
+                            .setNegativeButton("취소", null)
+                            .show();
+                } else {
+                    viewModel.setFragmentIndex(MainViewModel.FRAGMENT_LIST);
+                }
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(EditorFragment.this, callback);
+    }
 
     @Nullable
     @Override
@@ -69,8 +93,8 @@ public class MemoEditorFragment extends Fragment
     }
 
     private void setListener() {
-        binding.ibAddPhoto.setOnClickListener(MemoEditorFragment.this);
-        binding.ibSave.setOnClickListener(MemoEditorFragment.this);
+        binding.ibAddPhoto.setOnClickListener(EditorFragment.this);
+        binding.ibSave.setOnClickListener(EditorFragment.this);
     }
 
     private void setRecyclerView() {
@@ -90,7 +114,7 @@ public class MemoEditorFragment extends Fragment
                 binding.etTitle.setText(memo.getTitle());
                 binding.etContent.setText(memo.getContent());
 
-                MemoImageAdapter adapter = new MemoImageAdapter(memo.getImageDataList(), MemoEditorFragment.this);
+                EditorImageAdapter adapter = new EditorImageAdapter(memo.getImageDataList(), EditorFragment.this);
                 binding.rvImage.setAdapter(adapter);
             }
 
@@ -137,9 +161,9 @@ public class MemoEditorFragment extends Fragment
     public void onClick(View view) {
         if (view.getId() == R.id.ib_save) {
             viewModel.saveMemo();
-            viewModel.setFragmentIndex(MainViewModel.FRAGMENT_READER);
+            viewModel.setFragmentIndex(MainViewModel.FRAGMENT_VIEWER);
         } else if (view.getId() == R.id.ib_add_photo) {
-            AddPhotoBottomSheetDialog dialog = new AddPhotoBottomSheetDialog(requireContext(), MemoEditorFragment.this);
+            AddPhotoBottomSheetDialog dialog = new AddPhotoBottomSheetDialog(requireContext(), EditorFragment.this);
             dialog.show();
         }
     }
@@ -209,25 +233,17 @@ public class MemoEditorFragment extends Fragment
         builder.setView(editText);
 
         // Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String input = editText.getText().toString();
-                viewModel.addImage(new ImageData(ImageData.URL, Uri.parse(input).toString()));
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            String input = editText.getText().toString();
+            viewModel.addImage(new ImageData(ImageData.URL, Uri.parse(input).toString()));
 
-                MemoImageAdapter memoImageAdapter = (MemoImageAdapter) binding.rvImage.getAdapter();
-                if (memoImageAdapter != null) {
-                    int itemCount = memoImageAdapter.getItemCount();
-                    memoImageAdapter.notifyItemInserted(itemCount - 1);
-                }
+            EditorImageAdapter memoImageAdapter = (EditorImageAdapter) binding.rvImage.getAdapter();
+            if (memoImageAdapter != null) {
+                int itemCount = memoImageAdapter.getItemCount();
+                memoImageAdapter.notifyItemInserted(itemCount - 1);
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
         builder.show();
     }
@@ -240,7 +256,7 @@ public class MemoEditorFragment extends Fragment
     @Override
     public void onLoadFail(ImageData imageData) {
         int targetIndex = viewModel.removeImage(imageData);
-        MemoImageAdapter memoImageAdapter = (MemoImageAdapter) binding.rvImage.getAdapter();
+        EditorImageAdapter memoImageAdapter = (EditorImageAdapter) binding.rvImage.getAdapter();
         if (memoImageAdapter != null && targetIndex != -1) {
             memoImageAdapter.notifyItemRemoved(targetIndex);
         }
@@ -255,7 +271,7 @@ public class MemoEditorFragment extends Fragment
 
                     viewModel.addImage(new ImageData(ImageData.CAMERA, photoUri.toString()));
 
-                    MemoImageAdapter memoImageAdapter = (MemoImageAdapter) binding.rvImage.getAdapter();
+                    EditorImageAdapter memoImageAdapter = (EditorImageAdapter) binding.rvImage.getAdapter();
                     if (memoImageAdapter != null) {
                         int itemCount = memoImageAdapter.getItemCount();
                         memoImageAdapter.notifyItemInserted(itemCount - 1);
@@ -272,7 +288,7 @@ public class MemoEditorFragment extends Fragment
 
                     viewModel.addImages(imageDataList);
 
-                    MemoImageAdapter memoImageAdapter = (MemoImageAdapter) binding.rvImage.getAdapter();
+                    EditorImageAdapter memoImageAdapter = (EditorImageAdapter) binding.rvImage.getAdapter();
                     if (memoImageAdapter != null) {
                         int itemCount = memoImageAdapter.getItemCount();
                         memoImageAdapter.notifyItemRangeInserted(itemCount, itemCount + imageDataList.size() - 1);

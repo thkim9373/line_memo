@@ -1,18 +1,10 @@
-package com.hoony.line_memo.main.fragments.reader;
+package com.hoony.line_memo.main.fragments.viewer;
 
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.hoony.line_memo.R;
@@ -22,10 +14,33 @@ import com.hoony.line_memo.main.MainViewModel;
 
 import java.util.List;
 
-public class MemoReaderFragment extends Fragment implements View.OnClickListener, MemoImageAdapter.MemoImageAdapterListener {
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import static com.hoony.line_memo.main.MainViewModel.FRAGMENT_LIST;
+
+public class ViewerFragment extends Fragment implements View.OnClickListener, ViewerImageAdapter.MemoImageAdapterListener {
 
     private FragmentMemoReadBinding binding;
     private MainViewModel viewModel;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                viewModel.setFragmentIndex(FRAGMENT_LIST);
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(ViewerFragment.this, callback);
+    }
 
     @Nullable
     @Override
@@ -43,8 +58,8 @@ public class MemoReaderFragment extends Fragment implements View.OnClickListener
     }
 
     private void setListener() {
-        binding.ibEdit.setOnClickListener(MemoReaderFragment.this);
-        binding.ibImageClose.setOnClickListener(MemoReaderFragment.this);
+        binding.ibEdit.setOnClickListener(ViewerFragment.this);
+        binding.ibImageClose.setOnClickListener(ViewerFragment.this);
     }
 
     private void setRecyclerView() {
@@ -65,10 +80,10 @@ public class MemoReaderFragment extends Fragment implements View.OnClickListener
             binding.tvContent.setText(memo.getContent());
 
             if (memo.getImageDataList() != null) {
-                MemoImageAdapter adapter = (MemoImageAdapter) binding.rvImage.getAdapter();
+                ViewerImageAdapter adapter = (ViewerImageAdapter) binding.rvImage.getAdapter();
                 if (memo.getImageDataList().size() != 0) {
                     if (adapter == null) {
-                        adapter = new MemoImageAdapter(memo.getImageDataList(), MemoReaderFragment.this);
+                        adapter = new ViewerImageAdapter(memo.getImageDataList(), ViewerFragment.this);
                         binding.rvImage.setAdapter(adapter);
                     } else {
                         adapter.setImageDataList(memo.getImageDataList());
@@ -101,7 +116,7 @@ public class MemoReaderFragment extends Fragment implements View.OnClickListener
 
         Uri uri = Uri.parse(UriPath);
 
-        Glide.with(MemoReaderFragment.this)
+        Glide.with(ViewerFragment.this)
                 .load(uri)
                 .thumbnail(0.3f)
                 .fitCenter()

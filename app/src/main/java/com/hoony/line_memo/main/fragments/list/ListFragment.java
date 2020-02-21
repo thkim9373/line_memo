@@ -1,11 +1,14 @@
 package com.hoony.line_memo.main.fragments.list;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+
+import com.hoony.line_memo.R;
+import com.hoony.line_memo.databinding.FragmentMemoListBinding;
+import com.hoony.line_memo.main.MainViewModel;
+import com.hoony.line_memo.util.ToastPrinter;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -18,39 +21,32 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import com.hoony.line_memo.R;
-import com.hoony.line_memo.databinding.FragmentMemoListBinding;
-import com.hoony.line_memo.main.MainViewModel;
-
-import static com.hoony.line_memo.main.MainViewModel.FRAGMENT_LIST;
-
-public class MemoListFragment extends Fragment implements View.OnClickListener, MemoAdapter.onItemClickListener {
+public class ListFragment extends Fragment implements View.OnClickListener, MemoAdapter.onItemClickListener {
 
     private FragmentMemoListBinding binding;
     private MainViewModel viewModel;
 
+    private long backKeyPressedTime;
+
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                Toast.makeText(requireContext(), "onBackpressed!!!", Toast.LENGTH_SHORT).show();
-//                if (viewModel.getListFragmentMode() == MainViewModel.LIST_MODE_SELECT) {
-//                    MemoListFragment memoListFragment = (MemoListFragment) this.fragmentList.get(FRAGMENT_LIST);
-//                    memoListFragment.setModeDefault();
-//                } else {
-//                    if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
-//                        backKeyPressedTime = System.currentTimeMillis();
-//                        showToast("한 번 더 누르면 종료됩니다.");
-//                    } else {
-//                        finish();
-//                    }
-//                }
+                if (viewModel.getListFragmentMode() == MainViewModel.LIST_MODE_SELECT) {
+                    setModeDefault();
+                } else {
+                    if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
+                        backKeyPressedTime = System.currentTimeMillis();
+                        ToastPrinter.show("한 번 더 누르면 종료됩니다.", requireContext());
+                    } else {
+                        requireActivity().finish();
+                    }
+                }
             }
         };
-//        requireActivity().getOnBackPressedDispatcher().addCallback(MemoListFragment.this, callback);
-        requireActivity().getOnBackPressedDispatcher().addCallback(callback);
+        requireActivity().getOnBackPressedDispatcher().addCallback(ListFragment.this, callback);
     }
 
     @Nullable
@@ -74,8 +70,8 @@ public class MemoListFragment extends Fragment implements View.OnClickListener, 
     }
 
     private void setListener() {
-        binding.fabCreateMemo.setOnClickListener(MemoListFragment.this);
-        binding.ibDelete.setOnClickListener(MemoListFragment.this);
+        binding.fabCreateMemo.setOnClickListener(ListFragment.this);
+        binding.ibDelete.setOnClickListener(ListFragment.this);
     }
 
     @Override
@@ -90,7 +86,7 @@ public class MemoListFragment extends Fragment implements View.OnClickListener, 
             MemoAdapter adapter = (MemoAdapter) binding.svMemo.getAdapter();
             if (adapter == null) {
                 adapter = new MemoAdapter(memoList, viewModel.getListFragmentMode());
-                adapter.setListener(MemoListFragment.this);
+                adapter.setListener(ListFragment.this);
                 binding.svMemo.setAdapter(adapter);
             } else {
                 adapter.setList(memoList);
@@ -128,7 +124,7 @@ public class MemoListFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onItemClick(int position) {
         viewModel.setReadMemoMutableData(position);
-        viewModel.setFragmentIndex(MainViewModel.FRAGMENT_READER);
+        viewModel.setFragmentIndex(MainViewModel.FRAGMENT_VIEWER);
     }
 
     @Override
@@ -138,7 +134,7 @@ public class MemoListFragment extends Fragment implements View.OnClickListener, 
         viewModel.setListFragmentModeMutableData(MainViewModel.LIST_MODE_SELECT);
     }
 
-    public void setModeDefault() {
+    private void setModeDefault() {
         MemoAdapter memoAdapter = (MemoAdapter) binding.svMemo.getAdapter();
         if (memoAdapter != null) {
             memoAdapter.setMode(MainViewModel.LIST_MODE_DEFAULT);

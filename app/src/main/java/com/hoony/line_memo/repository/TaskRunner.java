@@ -6,7 +6,6 @@ import android.os.Looper;
 import com.hoony.line_memo.db.table.base.BaseDao;
 import com.hoony.line_memo.db.table.memo.Memo;
 import com.hoony.line_memo.repository.task.DeleteMemoListTask;
-import com.hoony.line_memo.repository.task.DeleteMemoTask;
 import com.hoony.line_memo.repository.task.GetAllMemoTask;
 import com.hoony.line_memo.repository.task.InsertMemoTask;
 import com.hoony.line_memo.repository.task.UpdateMemoTask;
@@ -51,17 +50,6 @@ class TaskRunner {
                 handler.post(callback::onUpdateMemoTaskSuccess);
             } catch (Exception e) {
                 handler.post(() -> callback.onUpdateMemoTaskFail(e));
-            }
-        });
-    }
-
-    void executeDeleteMemoTaskAsync(final Callable callable, DeleteMemoTask.DeleteMemoTaskCallback callback) {
-        executor.execute(() -> {
-            try {
-                callable.call();
-                handler.post(callback::onDeleteMemoTaskSuccess);
-            } catch (Exception e) {
-                handler.post(() -> callback.onDeleteMemoTaskFail(e));
             }
         });
     }

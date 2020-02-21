@@ -1,4 +1,4 @@
-package com.hoony.line_memo.main.fragments.reader;
+package com.hoony.line_memo.main.fragments.editor;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -18,24 +18,34 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.hoony.line_memo.R;
-import com.hoony.line_memo.databinding.ItemPhotoMemoBinding;
+import com.hoony.line_memo.databinding.ItemPhotoEditorBinding;
 import com.hoony.line_memo.db.pojo.ImageData;
 
 import java.util.List;
 
-public class MemoImageAdapter extends RecyclerView.Adapter {
+public class EditorImageAdapter extends RecyclerView.Adapter {
 
     private List<ImageData> mList;
-    private final MemoImageAdapterListener mListener;
+    private MemoImageAdapterListener mListener;
     private Context mContext;
 
-    MemoImageAdapter(List<ImageData> mList, MemoImageAdapterListener listener) {
+    public EditorImageAdapter(List<ImageData> mList, MemoImageAdapterListener listener) {
         this.mList = mList;
         this.mListener = listener;
     }
 
-    void setImageDataList(List<ImageData> imageDataList) {
+    public void setImageDataList(List<ImageData> imageDataList) {
         this.mList = imageDataList;
+    }
+
+    void addImageData(List<ImageData> imageDataList) {
+        int beforeListSize = mList.size();
+
+        this.mList.addAll(imageDataList);
+
+        int afterListSize = mList.size();
+
+        notifyItemRangeInserted(beforeListSize, afterListSize - 1);
     }
 
     interface MemoImageAdapterListener {
@@ -48,12 +58,12 @@ public class MemoImageAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (mContext == null) mContext = parent.getContext();
-        return new ItemHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_photo_memo, parent, false));
+        return new ItemHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_photo_editor, parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        ItemPhotoMemoBinding binding = ((ItemHolder) holder).getBinding();
+        ItemPhotoEditorBinding binding = ((ItemHolder) holder).getBinding();
 
         ImageData imageData = mList.get(position);
 
@@ -65,9 +75,7 @@ public class MemoImageAdapter extends RecyclerView.Adapter {
                 .addListener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        if (mListener != null) {
-                            mListener.onLoadFail(imageData);
-                        }
+                        if (mListener != null) mListener.onLoadFail(imageData);
                         return false;
                     }
 
@@ -86,22 +94,26 @@ public class MemoImageAdapter extends RecyclerView.Adapter {
 
     private class ItemHolder extends RecyclerView.ViewHolder {
 
-        private ItemPhotoMemoBinding binding;
+        private ItemPhotoEditorBinding binding;
 
         ItemHolder(@NonNull View itemView) {
             super(itemView);
             binding = DataBindingUtil.bind(itemView);
             if (binding != null) {
-                binding.ivPhoto.setOnClickListener(view -> {
+                binding.ibDelete.setOnClickListener(view -> {
                     int position = getAdapterPosition();
                     if (mListener != null && position != RecyclerView.NO_POSITION) {
+
+                        mList.remove(position);
+                        notifyItemRemoved(position);
+
                         mListener.onItemClick(position);
                     }
                 });
             }
         }
 
-        ItemPhotoMemoBinding getBinding() {
+        ItemPhotoEditorBinding getBinding() {
             return binding;
         }
     }

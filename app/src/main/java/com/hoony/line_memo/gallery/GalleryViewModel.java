@@ -68,7 +68,6 @@ public class GalleryViewModel extends AndroidViewModel {
                     )
             );
         }
-
         return result;
     }
 
