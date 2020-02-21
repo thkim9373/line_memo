@@ -9,16 +9,16 @@ public class ImageData implements Parcelable {
     public static final int GALLERY = 1;
     public static final int URL = 2;
 
-    private int kind;
+    private int type;
     private String uriPath;
 
-    public ImageData(int kind, String uriPath) {
-        this.kind = kind;
+    public ImageData(int type, String uriPath) {
+        this.type = type;
         this.uriPath = uriPath;
     }
 
     protected ImageData(Parcel in) {
-        kind = in.readInt();
+        type = in.readInt();
         uriPath = in.readString();
     }
 
@@ -34,12 +34,12 @@ public class ImageData implements Parcelable {
         }
     };
 
-    public int getKind() {
-        return kind;
+    public int getType() {
+        return type;
     }
 
-    public void setKind(int kind) {
-        this.kind = kind;
+    public void setType(int type) {
+        this.type = type;
     }
 
     public String getUriPath() {
@@ -57,7 +57,7 @@ public class ImageData implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeInt(kind);
+        parcel.writeInt(type);
         parcel.writeString(uriPath);
     }
 }

@@ -9,6 +9,6 @@ import java.util.List;
 
 @Dao
 public interface MemoDao extends BaseDao<Memo> {
-    @Query("SELECT * FROM memo ORDER BY id DESC")
+    @Query("SELECT * FROM memo ORDER BY date DESC, id DESC")
     List<Memo> getAll();
 }

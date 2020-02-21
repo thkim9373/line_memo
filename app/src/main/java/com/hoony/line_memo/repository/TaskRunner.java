@@ -3,7 +3,9 @@ package com.hoony.line_memo.repository;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.hoony.line_memo.db.table.base.BaseDao;
 import com.hoony.line_memo.db.table.memo.Memo;
+import com.hoony.line_memo.repository.task.DeleteMemoListTask;
 import com.hoony.line_memo.repository.task.DeleteMemoTask;
 import com.hoony.line_memo.repository.task.GetAllMemoTask;
 import com.hoony.line_memo.repository.task.InsertMemoTask;
@@ -30,11 +32,12 @@ class TaskRunner {
         });
     }
 
-    void executeInsertMemoTaskAsync(final Callable callable, InsertMemoTask.InsertMemoTaskCallback callback) {
+    void executeInsertMemoTaskAsync(final Callable<Long> callable, InsertMemoTask.InsertMemoTaskCallback callback) {
         executor.execute(() -> {
+            Long result;
             try {
-                callable.call();
-                handler.post(callback::onInsertMemoTaskSuccess);
+                result = callable.call();
+                handler.post(() -> callback.onInsertMemoTaskSuccess(BaseDao.INSERT, result));
             } catch (Exception e) {
                 handler.post(() -> callback.onInsertMemoTaskFail(e));
             }
@@ -59,6 +62,17 @@ class TaskRunner {
                 handler.post(callback::onDeleteMemoTaskSuccess);
             } catch (Exception e) {
                 handler.post(() -> callback.onDeleteMemoTaskFail(e));
+            }
+        });
+    }
+
+    void executeDeleteMemoListTaskAsync(final Callable callable, DeleteMemoListTask.DeleteMemoListTaskCallback callback) {
+        executor.execute(() -> {
+            try {
+                callable.call();
+                handler.post(callback::onDeleteMemoListTaskSuccess);
+            } catch (Exception e) {
+                handler.post(() -> callback.onDeleteMemoListTaskFail(e));
             }
         });
     }

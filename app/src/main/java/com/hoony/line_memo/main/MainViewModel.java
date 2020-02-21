@@ -9,7 +9,9 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.hoony.line_memo.db.pojo.ImageData;
 import com.hoony.line_memo.db.table.memo.Memo;
+import com.hoony.line_memo.main.fragments.list.pojo.CheckableMemo;
 import com.hoony.line_memo.repository.AppRepository;
+import com.hoony.line_memo.repository.task.DeleteMemoListTask;
 import com.hoony.line_memo.repository.task.DeleteMemoTask;
 import com.hoony.line_memo.repository.task.GetAllMemoTask;
 import com.hoony.line_memo.repository.task.InsertMemoTask;
@@ -25,11 +27,15 @@ public class MainViewModel extends AndroidViewModel
         implements GetAllMemoTask.GetAllMemoTaskCallback,
         InsertMemoTask.InsertMemoTaskCallback,
         DeleteMemoTask.DeleteMemoTaskCallback,
-        UpdateMemoTask.UpdateMemoTaskCallback {
+        UpdateMemoTask.UpdateMemoTaskCallback,
+        DeleteMemoListTask.DeleteMemoListTaskCallback {
 
     public static final int FRAGMENT_LIST = 0;
-    public static final int FRAGMENT_READ = 1;
-    public static final int FRAGMENT_WRITE = 2;
+    public static final int FRAGMENT_READER = 1;
+    public static final int FRAGMENT_EDITOR = 2;
+
+    public static final int LIST_MODE_DEFAULT = 0;
+    public static final int LIST_MODE_SELECT = 1;
 
     public static final int NEW_MEMO = 0;
     public static final int EDIT_MEMO = 1;
@@ -45,9 +51,13 @@ public class MainViewModel extends AndroidViewModel
 
     private MutableLiveData<Integer> fragmentIndex = new MutableLiveData<>();
 
-    private MutableLiveData<List<Memo>> memoListMutableData = new MutableLiveData<>();
+    private MutableLiveData<List<CheckableMemo>> memoListMutableData = new MutableLiveData<>();
+
+    private MutableLiveData<Integer> listFragmentModeMutableData = new MutableLiveData<>();
 
     private MutableLiveData<Memo> readMemoMutableData = new MutableLiveData<>();
+
+    private MutableLiveData<Boolean> isEdit = new MutableLiveData<>();
 
     private MutableLiveData<Memo> editMemoMutableData = new MutableLiveData<>();
 
@@ -55,12 +65,24 @@ public class MainViewModel extends AndroidViewModel
         return fragmentIndex;
     }
 
-    public MutableLiveData<List<Memo>> getMemoListMutableData() {
+    public MutableLiveData<List<CheckableMemo>> getMemoListMutableData() {
         return memoListMutableData;
+    }
+
+    public void setListFragmentModeMutableData(int mode) {
+        this.listFragmentModeMutableData.setValue(mode);
+    }
+
+    public int getListFragmentMode() {
+        return this.listFragmentModeMutableData.getValue() != null ? this.listFragmentModeMutableData.getValue() : LIST_MODE_DEFAULT;
     }
 
     public MutableLiveData<Memo> getReadMemoMutableData() {
         return readMemoMutableData;
+    }
+
+    public boolean isEdit() {
+        return isEdit.getValue() != null ? isEdit.getValue() : false;
     }
 
     public MutableLiveData<Memo> getEditMemoMutableData() {
@@ -69,7 +91,7 @@ public class MainViewModel extends AndroidViewModel
 
     public String getSelectedImageUri(int position) {
         Memo memo = this.readMemoMutableData.getValue();
-        if(memo == null) return null;
+        if (memo == null) return null;
 
         return memo.getImageDataList().get(position).getUriPath();
     }
@@ -114,12 +136,14 @@ public class MainViewModel extends AndroidViewModel
         Memo memo = this.editMemoMutableData.getValue();
         if (memo == null) return;
         memo.setTitle(title);
+        this.isEdit.setValue(true);
     }
 
     public void setMemoContent(String content) {
         Memo memo = this.editMemoMutableData.getValue();
         if (memo == null) return;
         memo.setContent(content);
+        this.isEdit.setValue(true);
     }
 
     public void addImages(List<ImageData> imageDataList) {
@@ -128,14 +152,29 @@ public class MainViewModel extends AndroidViewModel
 
         if (memo.getImageDataList() == null) memo.setImageDataList(new ArrayList<>());
         memo.getImageDataList().addAll(imageDataList);
+        this.isEdit.setValue(true);
     }
 
-    public void addImages(ImageData imageData) {
+    public void addImage(ImageData imageData) {
         Memo memo = this.editMemoMutableData.getValue();
         if (memo == null) return;
 
         if (memo.getImageDataList() == null) memo.setImageDataList(new ArrayList<>());
         memo.getImageDataList().add(imageData);
+        this.isEdit.setValue(true);
+    }
+
+    public int removeImage(ImageData imageData) {
+        Memo memo = this.editMemoMutableData.getValue();
+        if (memo == null) return -1;
+
+        if (memo.getImageDataList() == null) memo.setImageDataList(new ArrayList<>());
+
+        int targetIndex = memo.getImageDataList().indexOf(imageData);
+        memo.getImageDataList().remove(imageData);
+        this.isEdit.setValue(true);
+
+        return targetIndex;
     }
 
     public void saveMemo() {
@@ -147,7 +186,7 @@ public class MainViewModel extends AndroidViewModel
 
         memo.setDate(date);
 
-        List<Memo> memoList = this.memoListMutableData.getValue();
+        List<CheckableMemo> memoList = this.memoListMutableData.getValue();
         boolean isContain = false;
 
         if (memoList != null) {
@@ -158,7 +197,7 @@ public class MainViewModel extends AndroidViewModel
                 }
             }
             if (!isContain) {
-                memoList.add(memo);
+                memoList.add(new CheckableMemo(memo));
             }
         }
 
@@ -177,9 +216,17 @@ public class MainViewModel extends AndroidViewModel
         appRepository.deleteMemo(memo, MainViewModel.this);
     }
 
+    public void deleteMemoList(List<Memo> memoList) {
+        appRepository.deleteMemoList(memoList, MainViewModel.this);
+    }
+
     @Override
     public void onGetAllMemoTaskSuccess(List<Memo> memoList) {
-        memoListMutableData.setValue(memoList);
+        List<CheckableMemo> checkableMemoList = new ArrayList<>();
+        for (Memo memo : memoList) {
+            checkableMemoList.add(new CheckableMemo(memo));
+        }
+        memoListMutableData.setValue(checkableMemoList);
     }
 
     @Override
@@ -198,7 +245,9 @@ public class MainViewModel extends AndroidViewModel
     }
 
     @Override
-    public void onInsertMemoTaskSuccess() {
+    public void onInsertMemoTaskSuccess(int type, long l) {
+        if (this.readMemoMutableData.getValue() != null)
+            this.readMemoMutableData.getValue().setId((int) l);
         getAllMemo();
     }
 
@@ -214,6 +263,16 @@ public class MainViewModel extends AndroidViewModel
 
     @Override
     public void onUpdateMemoTaskFail(Exception e) {
+        Log.d("Hoony", e.toString());
+    }
+
+    @Override
+    public void onDeleteMemoListTaskSuccess() {
+        getAllMemo();
+    }
+
+    @Override
+    public void onDeleteMemoListTaskFail(Exception e) {
         Log.d("Hoony", e.toString());
     }
 }

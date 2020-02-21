@@ -6,11 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
-import com.hoony.line_memo.R;
-import com.hoony.line_memo.databinding.FragmentMemoReadBinding;
-import com.hoony.line_memo.main.MainViewModel;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -18,6 +13,14 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.hoony.line_memo.R;
+import com.hoony.line_memo.databinding.FragmentMemoReadBinding;
+import com.hoony.line_memo.db.pojo.ImageData;
+import com.hoony.line_memo.main.MainViewModel;
+
+import java.util.List;
 
 public class MemoReaderFragment extends Fragment implements View.OnClickListener, MemoImageAdapter.MemoImageAdapterListener {
 
@@ -63,15 +66,20 @@ public class MemoReaderFragment extends Fragment implements View.OnClickListener
 
             if (memo.getImageDataList() != null) {
                 MemoImageAdapter adapter = (MemoImageAdapter) binding.rvImage.getAdapter();
-                if (adapter == null) {
-                    adapter = new MemoImageAdapter(memo.getImageDataList(), MemoReaderFragment.this);
-                    binding.rvImage.setAdapter(adapter);
+                if (memo.getImageDataList().size() != 0) {
+                    if (adapter == null) {
+                        adapter = new MemoImageAdapter(memo.getImageDataList(), MemoReaderFragment.this);
+                        binding.rvImage.setAdapter(adapter);
+                    } else {
+                        adapter.setImageDataList(memo.getImageDataList());
+                        adapter.notifyDataSetChanged();
+                    }
                 } else {
-                    adapter.setImageDataList(memo.getImageDataList());
-                    adapter.notifyDataSetChanged();
+                    binding.rvImage.setVisibility(View.GONE);
                 }
+            } else {
+                binding.rvImage.setVisibility(View.GONE);
             }
-
         });
     }
 
@@ -79,7 +87,7 @@ public class MemoReaderFragment extends Fragment implements View.OnClickListener
     public void onClick(View view) {
         if (view.getId() == R.id.ib_edit) {
             viewModel.initEditMemoMutableData();
-            viewModel.setFragmentIndex(MainViewModel.FRAGMENT_WRITE);
+            viewModel.setFragmentIndex(MainViewModel.FRAGMENT_EDITOR);
         } else if (view.getId() == R.id.ib_image_close) {
             binding.clSelectedImageContainer.setVisibility(View.INVISIBLE);
         }
@@ -98,6 +106,19 @@ public class MemoReaderFragment extends Fragment implements View.OnClickListener
                 .thumbnail(0.3f)
                 .fitCenter()
                 .into(binding.ivSelectedImage);
+    }
+
+    @Override
+    public void onLoadFail(ImageData imageData) {
+        if (viewModel.getReadMemoMutableData().getValue() != null) {
+            List<ImageData> imageDataList = viewModel.getReadMemoMutableData().getValue().getImageDataList();
+
+            int removeIndex = imageDataList.indexOf(imageData);
+            imageDataList.remove(imageData);
+            if (binding.rvImage.getAdapter() != null)
+                binding.rvImage.getAdapter().notifyItemRemoved(removeIndex);
+            if (imageDataList.size() == 0) binding.rvImage.setVisibility(View.GONE);
+        }
     }
 
     @Override

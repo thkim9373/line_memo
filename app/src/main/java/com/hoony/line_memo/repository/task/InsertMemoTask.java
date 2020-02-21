@@ -5,7 +5,7 @@ import com.hoony.line_memo.db.table.memo.MemoDao;
 
 import java.util.concurrent.Callable;
 
-public class InsertMemoTask implements Callable {
+public class InsertMemoTask implements Callable<Long> {
 
     private final MemoDao memoDao;
     private final Memo memo;
@@ -16,14 +16,13 @@ public class InsertMemoTask implements Callable {
     }
 
     public interface InsertMemoTaskCallback {
-        void onInsertMemoTaskSuccess();
+        void onInsertMemoTaskSuccess(int type, long l);
 
         void onInsertMemoTaskFail(Exception e);
     }
 
     @Override
-    public Object call() {
-        memoDao.insert(memo);
-        return null;
+    public Long call() {
+        return memoDao.insert(memo);
     }
 }

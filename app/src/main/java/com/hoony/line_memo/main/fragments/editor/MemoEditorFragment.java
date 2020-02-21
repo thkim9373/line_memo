@@ -2,6 +2,9 @@ package com.hoony.line_memo.main.fragments.editor;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -13,6 +16,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.hoony.line_memo.R;
 import com.hoony.line_memo.databinding.FragmentMemoEditBinding;
@@ -26,17 +40,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 public class MemoEditorFragment extends Fragment
         implements View.OnClickListener,
@@ -134,7 +137,7 @@ public class MemoEditorFragment extends Fragment
     public void onClick(View view) {
         if (view.getId() == R.id.ib_save) {
             viewModel.saveMemo();
-            viewModel.setFragmentIndex(MainViewModel.FRAGMENT_LIST);
+            viewModel.setFragmentIndex(MainViewModel.FRAGMENT_READER);
         } else if (view.getId() == R.id.ib_add_photo) {
             AddPhotoBottomSheetDialog dialog = new AddPhotoBottomSheetDialog(requireContext(), MemoEditorFragment.this);
             dialog.show();
@@ -210,7 +213,7 @@ public class MemoEditorFragment extends Fragment
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String input = editText.getText().toString();
-                viewModel.addImages(new ImageData(ImageData.URL, Uri.parse(input).toString()));
+                viewModel.addImage(new ImageData(ImageData.URL, Uri.parse(input).toString()));
 
                 MemoImageAdapter memoImageAdapter = (MemoImageAdapter) binding.rvImage.getAdapter();
                 if (memoImageAdapter != null) {
@@ -235,13 +238,22 @@ public class MemoEditorFragment extends Fragment
     }
 
     @Override
+    public void onLoadFail(ImageData imageData) {
+        int targetIndex = viewModel.removeImage(imageData);
+        MemoImageAdapter memoImageAdapter = (MemoImageAdapter) binding.rvImage.getAdapter();
+        if (memoImageAdapter != null && targetIndex != -1) {
+            memoImageAdapter.notifyItemRemoved(targetIndex);
+        }
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_CAMERA:
                 if (resultCode == AppCompatActivity.RESULT_OK) {
 
-                    viewModel.addImages(new ImageData(ImageData.CAMERA, photoUri.toString()));
+                    viewModel.addImage(new ImageData(ImageData.CAMERA, photoUri.toString()));
 
                     MemoImageAdapter memoImageAdapter = (MemoImageAdapter) binding.rvImage.getAdapter();
                     if (memoImageAdapter != null) {
@@ -270,6 +282,23 @@ public class MemoEditorFragment extends Fragment
             case REQUEST_URL:
                 break;
         }
+    }
+
+    private int exifOrientationToDegrees(int exifOrientation) {
+        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
+            return 90;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
+            return 180;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
+            return 270;
+        }
+        return 0;
+    }
+
+    private Bitmap rotate(Bitmap bitmap, float degree) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
     @Override

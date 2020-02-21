@@ -86,7 +86,7 @@ public class GalleryActivity extends AppCompatActivity implements View.OnClickLi
 
                 for (CheckableImageData checkableImageData : checkableImageDataList) {
                     if (checkableImageData.isChecked())
-                        imageDataList.add(new ImageData(checkableImageData.getKind(), checkableImageData.getUriPath()));
+                        imageDataList.add(new ImageData(checkableImageData.getType(), checkableImageData.getUriPath()));
                 }
 
                 Intent intent = new Intent();

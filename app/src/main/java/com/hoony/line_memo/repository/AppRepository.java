@@ -5,10 +5,13 @@ import android.app.Application;
 import com.hoony.line_memo.db.AppDatabase;
 import com.hoony.line_memo.db.table.memo.Memo;
 import com.hoony.line_memo.db.table.memo.MemoDao;
+import com.hoony.line_memo.repository.task.DeleteMemoListTask;
 import com.hoony.line_memo.repository.task.DeleteMemoTask;
 import com.hoony.line_memo.repository.task.GetAllMemoTask;
 import com.hoony.line_memo.repository.task.InsertMemoTask;
 import com.hoony.line_memo.repository.task.UpdateMemoTask;
+
+import java.util.List;
 
 public class AppRepository {
     private static AppRepository INSTANCE;
@@ -47,8 +50,8 @@ public class AppRepository {
         taskRunner.executeDeleteMemoTaskAsync(new DeleteMemoTask(memoDao, memo), callback);
     }
 
-//    public void deleteMemo(List<Memo> memoList, DeleteMemoTask.DeleteMemoTaskCallback callback) {
-//        TaskRunner taskRunner = new TaskRunner();
-//        taskRunner.executeDeleteMemoTaskAsync(new DeleteMemoTask(memoDao, memoList), callback);
-//    }
+    public void deleteMemoList(List<Memo> memoList, DeleteMemoListTask.DeleteMemoListTaskCallback callback) {
+        TaskRunner taskRunner = new TaskRunner();
+        taskRunner.executeDeleteMemoListTaskAsync(new DeleteMemoListTask(memoDao, memoList), callback);
+    }
 }

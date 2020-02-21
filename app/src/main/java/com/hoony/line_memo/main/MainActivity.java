@@ -13,16 +13,16 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.hoony.line_memo.R;
 import com.hoony.line_memo.databinding.ActivityMainBinding;
-import com.hoony.line_memo.main.fragments.reader.MemoReaderFragment;
 import com.hoony.line_memo.main.fragments.editor.MemoEditorFragment;
 import com.hoony.line_memo.main.fragments.list.MemoListFragment;
+import com.hoony.line_memo.main.fragments.reader.MemoReaderFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.hoony.line_memo.main.MainViewModel.FRAGMENT_EDITOR;
 import static com.hoony.line_memo.main.MainViewModel.FRAGMENT_LIST;
-import static com.hoony.line_memo.main.MainViewModel.FRAGMENT_READ;
-import static com.hoony.line_memo.main.MainViewModel.FRAGMENT_WRITE;
+import static com.hoony.line_memo.main.MainViewModel.FRAGMENT_READER;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -61,17 +61,27 @@ public class MainActivity extends AppCompatActivity {
                 viewModel.getFragmentIndex().getValue() : -1;
         switch (fragmentIndex) {
             case FRAGMENT_LIST:
-                if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
-                    backKeyPressedTime = System.currentTimeMillis();
-                    showToast("한 번 더 누르면 종료됩니다.");
-                } else {
-                    finish();
-                }
+//                if (viewModel.getListFragmentMode() == MainViewModel.LIST_MODE_SELECT) {
+//                    MemoListFragment memoListFragment = (MemoListFragment) this.fragmentList.get(FRAGMENT_LIST);
+//                    memoListFragment.setModeDefault();
+//                } else {
+//                    if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
+//                        backKeyPressedTime = System.currentTimeMillis();
+//                        showToast("한 번 더 누르면 종료됩니다.");
+//                    } else {
+//                        finish();
+//                    }
+//                }
                 break;
-            case FRAGMENT_READ:
+            case FRAGMENT_READER:
                 viewModel.setFragmentIndex(FRAGMENT_LIST);
                 break;
-            case FRAGMENT_WRITE:
+            case FRAGMENT_EDITOR:
+//                TODO
+                if (viewModel.isEdit()) {
+
+                } else {
+                }
                 viewModel.setFragmentIndex(FRAGMENT_LIST);
                 break;
         }

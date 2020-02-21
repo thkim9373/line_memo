@@ -10,8 +10,12 @@ import java.util.List;
 @Dao
 public interface BaseDao<T> {
 
+    public static final int INSERT = 0;
+    public static final int UPDATE = 1;
+    public static final int DELETE = 2;
+
     @Insert
-    void insert(T obj);
+    long insert(T obj);
 
     @Update
     void update(T obj);
