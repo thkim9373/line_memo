@@ -7,11 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.databinding.DataBindingUtil;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -26,6 +21,11 @@ import com.hoony.line_memo.main.fragments.list.pojo.CheckableMemo;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class MemoAdapter extends RecyclerView.Adapter {
 
@@ -94,7 +94,7 @@ public class MemoAdapter extends RecyclerView.Adapter {
         binding.tvContent.setText(memo.getContent());
         binding.tvDate.setText(memo.getDate());
 
-        showThumbnail(memo.getImageDataList(), 0, binding);
+        showThumbnail(memo.getImageDataList(), binding);
 
         if (memo.isChecked()) {
             binding.clCancelLayout.setVisibility(View.VISIBLE);
@@ -103,9 +103,9 @@ public class MemoAdapter extends RecyclerView.Adapter {
         }
     }
 
-    private void showThumbnail(List<ImageData> imageDataList, int position, ItemMemoListBinding binding) {
+    private void showThumbnail(List<ImageData> imageDataList, ItemMemoListBinding binding) {
         if (imageDataList != null && imageDataList.size() > 0) {
-            ImageData imageData = imageDataList.get(position);
+            ImageData imageData = imageDataList.get(0);
 
             Uri uri = Uri.parse(imageData.getUriPath());
 

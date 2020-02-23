@@ -1,6 +1,7 @@
 package com.hoony.line_memo.main;
 
 import android.app.Application;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.hoony.line_memo.db.pojo.ImageData;
@@ -8,6 +9,7 @@ import com.hoony.line_memo.db.table.memo.Memo;
 import com.hoony.line_memo.main.fragments.list.pojo.CheckableMemo;
 import com.hoony.line_memo.repository.AppRepository;
 import com.hoony.line_memo.repository.task.DeleteMemoListTask;
+import com.hoony.line_memo.repository.task.DeleteMemoTask;
 import com.hoony.line_memo.repository.task.GetAllMemoTask;
 import com.hoony.line_memo.repository.task.InsertMemoTask;
 import com.hoony.line_memo.repository.task.UpdateMemoTask;
@@ -29,6 +31,7 @@ public class MainViewModel extends AndroidViewModel
         implements GetAllMemoTask.GetAllMemoTaskCallback,
         InsertMemoTask.InsertMemoTaskCallback,
         UpdateMemoTask.UpdateMemoTaskCallback,
+        DeleteMemoTask.DeleteMemoTaskCallback,
         DeleteMemoListTask.DeleteMemoListTaskCallback {
 
     public static final int FRAGMENT_LIST = 0;
@@ -121,6 +124,7 @@ public class MainViewModel extends AndroidViewModel
     @Retention(RetentionPolicy.SOURCE)
     @interface FragmentIndex {
     }
+
     public void setFragmentIndex(@FragmentIndex int fragmentIndex) {
         this.fragmentIndex.setValue(fragmentIndex);
     }
@@ -168,22 +172,29 @@ public class MainViewModel extends AndroidViewModel
         this.isUpdate.setValue(true);
     }
 
-    public int removeImage(ImageData imageData) {
-        Memo memo = this.editMemoMutableData.getValue();
-        if (memo == null) return -1;
-
-        if (memo.getImageDataList() == null) memo.setImageDataList(new ArrayList<>());
-
-        int targetIndex = memo.getImageDataList().indexOf(imageData);
-        memo.getImageDataList().remove(imageData);
+    public void removeImage() {
+//        Memo memo = this.editMemoMutableData.getValue();
+//        if (memo == null) return -1;
+//
+//        if (memo.getImageDataList() == null) memo.setImageDataList(new ArrayList<>());
+//
+//        int targetIndex = memo.getImageDataList().indexOf(imageData);
+//        memo.getImageDataList().remove(imageData);
         this.isUpdate.setValue(true);
-
-        return targetIndex;
     }
 
-    public void saveMemo() {
+    public final static int MEMO_NO_UPDATE = -1;
+    public final static int MEMO_NO_CONTENT = 0;
+    public final static int MEMO_SAVE_COMPLETE = 1;
+
+    public int saveMemo() {
         Memo memo = this.editMemoMutableData.getValue();
-        if (memo == null) return;
+        if (memo == null) return MEMO_NO_CONTENT;
+
+        if ((TextUtils.equals(memo.getTitle(), "") || memo.getTitle() == null) &&
+                (TextUtils.equals(memo.getContent(), "") || memo.getContent() == null) &&
+                memo.getImageDataList().size() == 0) return MEMO_NO_CONTENT;
+        if (!this.isUpdate()) return MEMO_NO_UPDATE;
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
         String date = dateFormat.format(new Date());
@@ -211,10 +222,18 @@ public class MainViewModel extends AndroidViewModel
         }
 
         this.readMemoMutableData.setValue(memo);
+        return MEMO_SAVE_COMPLETE;
     }
 
     public void deleteMemoList(List<Memo> memoList) {
         appRepository.deleteMemoList(memoList, MainViewModel.this);
+    }
+
+    public void deleteMemo() {
+        Memo memo = this.readMemoMutableData.getValue();
+        if (memo == null) return;
+
+        appRepository.deleteMemo(memo, MainViewModel.this);
     }
 
     @Override
@@ -247,11 +266,23 @@ public class MainViewModel extends AndroidViewModel
 
     @Override
     public void onUpdateMemoTaskSuccess() {
+        setFragmentIndex(FRAGMENT_VIEWER);
         getAllMemo();
     }
 
     @Override
     public void onUpdateMemoTaskFail(Exception e) {
+        Log.d("Hoony", e.toString());
+    }
+
+    @Override
+    public void onDeleteMemoTaskSuccess() {
+        getAllMemo();
+        this.setFragmentIndex(FRAGMENT_LIST);
+    }
+
+    @Override
+    public void onDeleteMemoTaskFail(Exception e) {
         Log.d("Hoony", e.toString());
     }
 

@@ -8,15 +8,14 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.hoony.line_memo.R;
-import com.hoony.line_memo.databinding.FragmentMemoReadBinding;
-import com.hoony.line_memo.db.pojo.ImageData;
+import com.hoony.line_memo.databinding.FragmentMemoViewerBinding;
 import com.hoony.line_memo.main.MainViewModel;
-
-import java.util.List;
+import com.hoony.line_memo.util.ToastPrinter;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -27,7 +26,7 @@ import static com.hoony.line_memo.main.MainViewModel.FRAGMENT_LIST;
 
 public class ViewerFragment extends Fragment implements View.OnClickListener, ViewerImageAdapter.MemoImageAdapterListener {
 
-    private FragmentMemoReadBinding binding;
+    private FragmentMemoViewerBinding binding;
     private MainViewModel viewModel;
 
     @Override
@@ -45,7 +44,7 @@ public class ViewerFragment extends Fragment implements View.OnClickListener, Vi
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_memo_read, container, false);
+        View view = inflater.inflate(R.layout.fragment_memo_viewer, container, false);
         binding = DataBindingUtil.bind(view);
         return view;
     }
@@ -59,6 +58,7 @@ public class ViewerFragment extends Fragment implements View.OnClickListener, Vi
 
     private void setListener() {
         binding.ibEdit.setOnClickListener(ViewerFragment.this);
+        binding.ibDelete.setOnClickListener(ViewerFragment.this);
         binding.ibImageClose.setOnClickListener(ViewerFragment.this);
     }
 
@@ -103,9 +103,20 @@ public class ViewerFragment extends Fragment implements View.OnClickListener, Vi
         if (view.getId() == R.id.ib_edit) {
             viewModel.initEditMemoMutableData();
             viewModel.setFragmentIndex(MainViewModel.FRAGMENT_EDITOR);
+        } else if (view.getId() == R.id.ib_delete) {
+
+            new AlertDialog.Builder(requireContext())
+                    .setMessage(getString(R.string.do_you_want_to_delete_the_note))
+                    .setPositiveButton(getString(R.string.confirm), (dialog, which) -> deleteMemo())
+                    .setNegativeButton(getString(R.string.cancel), null)
+                    .show();
         } else if (view.getId() == R.id.ib_image_close) {
             binding.clSelectedImageContainer.setVisibility(View.INVISIBLE);
         }
+    }
+
+    private void deleteMemo() {
+        viewModel.deleteMemo();
     }
 
     @Override
@@ -124,16 +135,8 @@ public class ViewerFragment extends Fragment implements View.OnClickListener, Vi
     }
 
     @Override
-    public void onLoadFail(ImageData imageData) {
-        if (viewModel.getReadMemoMutableData().getValue() != null) {
-            List<ImageData> imageDataList = viewModel.getReadMemoMutableData().getValue().getImageDataList();
-
-            int removeIndex = imageDataList.indexOf(imageData);
-            imageDataList.remove(imageData);
-            if (binding.rvImage.getAdapter() != null)
-                binding.rvImage.getAdapter().notifyItemRemoved(removeIndex);
-            if (imageDataList.size() == 0) binding.rvImage.setVisibility(View.GONE);
-        }
+    public void onLoadFail() {
+        ToastPrinter.show(getString(R.string.failed_to_load_image), requireContext());
     }
 
     @Override

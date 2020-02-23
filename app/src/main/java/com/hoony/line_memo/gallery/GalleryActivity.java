@@ -10,14 +10,6 @@ import android.os.Parcelable;
 import android.provider.Settings;
 import android.view.View;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
-
 import com.hoony.line_memo.R;
 import com.hoony.line_memo.databinding.ActivityPhotoGridViewBinding;
 import com.hoony.line_memo.db.pojo.ImageData;
@@ -25,6 +17,14 @@ import com.hoony.line_memo.gallery.pojo.CheckableImageData;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
 
 public class GalleryActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -115,15 +115,15 @@ public class GalleryActivity extends AppCompatActivity implements View.OnClickLi
         for (int result : grantResults) {
             if (result == PackageManager.PERMISSION_DENIED) {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(GalleryActivity.this);
-                dialog.setTitle("Need permissions");
-                dialog.setMessage("Please allow the permissions.");
-                dialog.setPositiveButton("Setting", (dialogInterface, i) -> {
+                dialog.setTitle(getString(R.string.notice));
+                dialog.setMessage(getString(R.string.please_grant_permission));
+                dialog.setPositiveButton(getString(R.string.setting), (dialogInterface, i) -> {
                     Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                             Uri.fromParts("package", getPackageName(), null));
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 });
-                dialog.setNegativeButton("Close", (dialogInterface, i) -> finish());
+                dialog.setNegativeButton(getString(R.string.cancel), (dialogInterface, i) -> finish());
                 dialog.show();
                 return;
             }

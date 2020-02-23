@@ -11,15 +11,35 @@ public class ImageData implements Parcelable {
 
     private int type;
     private String uriPath;
+    private String filePath;
 
     public ImageData(int type, String uriPath) {
         this.type = type;
         this.uriPath = uriPath;
     }
 
+    public ImageData(int type, String uriPath, String filePath) {
+        this.type = type;
+        this.uriPath = uriPath;
+        this.filePath = filePath;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public String getUriPath() {
+        return uriPath;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
     protected ImageData(Parcel in) {
         type = in.readInt();
         uriPath = in.readString();
+        filePath = in.readString();
     }
 
     public static final Creator<ImageData> CREATOR = new Creator<ImageData>() {
@@ -34,22 +54,6 @@ public class ImageData implements Parcelable {
         }
     };
 
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-    }
-
-    public String getUriPath() {
-        return uriPath;
-    }
-
-    public void setUriPath(String uriPath) {
-        this.uriPath = uriPath;
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -59,5 +63,6 @@ public class ImageData implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(type);
         parcel.writeString(uriPath);
+        parcel.writeString(filePath);
     }
 }

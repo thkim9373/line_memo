@@ -103,13 +103,12 @@ public class ListFragment extends Fragment implements View.OnClickListener, Memo
         } else if (view.getId() == R.id.ib_delete) {
 
             new AlertDialog.Builder(requireContext())
-                    .setTitle("메모 삭제")
-                    .setMessage("메모를 삭제하시겠습니까?")
-                    .setPositiveButton("확인", (dialog, which) -> {
+                    .setMessage(getString(R.string.do_you_want_to_delete_the_note))
+                    .setPositiveButton(getString(R.string.confirm), (dialog, which) -> {
                         deleteMemoList();
                         setModeDefault();
                     })
-                    .setNegativeButton("취소", null)
+                    .setNegativeButton(getString(R.string.cancel), null)
                     .show();
         }
     }

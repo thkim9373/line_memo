@@ -6,6 +6,12 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:editTextStyle">@style/CustomEditText</item>
+    </style>
+
+    <style name="CustomEditText" parent="Widget.AppCompat.EditText">
+        <item name="android:backgroundTint">@color/GRAY</item>
     </style>
 
     <style name="AppBarTitle">

@@ -6,6 +6,7 @@ import com.hoony.line_memo.db.AppDatabase;
 import com.hoony.line_memo.db.table.memo.Memo;
 import com.hoony.line_memo.db.table.memo.MemoDao;
 import com.hoony.line_memo.repository.task.DeleteMemoListTask;
+import com.hoony.line_memo.repository.task.DeleteMemoTask;
 import com.hoony.line_memo.repository.task.GetAllMemoTask;
 import com.hoony.line_memo.repository.task.InsertMemoTask;
 import com.hoony.line_memo.repository.task.UpdateMemoTask;
@@ -42,6 +43,11 @@ public class AppRepository {
     public void updateMemo(Memo memo, UpdateMemoTask.UpdateMemoTaskCallback callback) {
         TaskRunner taskRunner = new TaskRunner();
         taskRunner.executeUpdateMemoTaskAsync(new UpdateMemoTask(memoDao, memo), callback);
+    }
+
+    public void deleteMemo(Memo memo, DeleteMemoTask.DeleteMemoTaskCallback callback) {
+        TaskRunner taskRunner = new TaskRunner();
+        taskRunner.executeDeleteMemoTaskAsync(new DeleteMemoTask(memoDao, memo), callback);
     }
 
     public void deleteMemoList(List<Memo> memoList, DeleteMemoListTask.DeleteMemoListTaskCallback callback) {

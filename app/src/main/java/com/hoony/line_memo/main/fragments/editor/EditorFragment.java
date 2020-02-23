@@ -1,9 +1,6 @@
 package com.hoony.line_memo.main.fragments.editor;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -21,6 +18,8 @@ import com.hoony.line_memo.databinding.FragmentMemoEditBinding;
 import com.hoony.line_memo.db.pojo.ImageData;
 import com.hoony.line_memo.gallery.GalleryActivity;
 import com.hoony.line_memo.main.MainViewModel;
+import com.hoony.line_memo.util.InternetStateChecker;
+import com.hoony.line_memo.util.ToastPrinter;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +40,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+/**
+ * 메모 내용을 수정할 수 있는 프래그먼트.
+ */
 public class EditorFragment extends Fragment
         implements View.OnClickListener,
         AddPhotoBottomSheetDialog.AddPhotoBottomSheetDialogListener,
@@ -48,7 +50,6 @@ public class EditorFragment extends Fragment
 
     private final int REQUEST_CAMERA = 0;
     private final int REQUEST_GALLERY = 1;
-    private final int REQUEST_URL = 2;
 
     private FragmentMemoEditBinding binding;
     private MainViewModel viewModel;
@@ -61,13 +62,11 @@ public class EditorFragment extends Fragment
             public void handleOnBackPressed() {
                 if (viewModel.isUpdate()) {
                     new AlertDialog.Builder(requireContext())
-                            .setMessage("변경 사항을 저장 할까요?")
-                            .setPositiveButton("저장", (dialogInterface, i) -> {
-                                viewModel.saveMemo();
-                            })
-                            .setNeutralButton("저장 안함", (dialogInterface, i) -> viewModel.setFragmentIndex(MainViewModel.FRAGMENT_LIST)
+                            .setMessage(getString(R.string.do_you_want_to_save_your_changes))
+                            .setPositiveButton(getString(R.string.save), (dialogInterface, i) -> viewModel.saveMemo())
+                            .setNeutralButton(getString(R.string.no_save), (dialogInterface, i) -> viewModel.setFragmentIndex(MainViewModel.FRAGMENT_LIST)
                             )
-                            .setNegativeButton("취소", null)
+                            .setNegativeButton(getString(R.string.cancel), null)
                             .show();
                 } else {
                     viewModel.setFragmentIndex(MainViewModel.FRAGMENT_LIST);
@@ -160,8 +159,21 @@ public class EditorFragment extends Fragment
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.ib_save) {
-            viewModel.saveMemo();
-            viewModel.setFragmentIndex(MainViewModel.FRAGMENT_VIEWER);
+            int result = viewModel.saveMemo();
+            switch (result) {
+                case MainViewModel.MEMO_NO_CONTENT:
+                    ToastPrinter.show(getString(R.string.no_save_because_empty_content), requireContext());
+                    viewModel.setFragmentIndex(MainViewModel.FRAGMENT_LIST);
+                    break;
+                case MainViewModel.MEMO_NO_UPDATE:
+                    ToastPrinter.show(getString(R.string.no_save_because_no_updated), requireContext());
+                    viewModel.setFragmentIndex(MainViewModel.FRAGMENT_VIEWER);
+                    break;
+                case MainViewModel.MEMO_SAVE_COMPLETE:
+                    ToastPrinter.show(getString(R.string.save_complete), requireContext());
+                    viewModel.setFragmentIndex(MainViewModel.FRAGMENT_VIEWER);
+                    break;
+            }
         } else if (view.getId() == R.id.ib_add_photo) {
             AddPhotoBottomSheetDialog dialog = new AddPhotoBottomSheetDialog(requireContext(), EditorFragment.this);
             dialog.show();
@@ -194,14 +206,13 @@ public class EditorFragment extends Fragment
         }
     }
 
-    String currentPhotoPath;
+    private String currentPhotoPath;
 
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-//        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
@@ -221,45 +232,56 @@ public class EditorFragment extends Fragment
 
     @Override
     public void onUrlClick() {
+        if (InternetStateChecker.checkNetworkConnected(requireContext())) {
+            //  출처 : https://stackoverflow.com/questions/10903754/input-text-dialog-android
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+            builder.setTitle(getString(R.string.enter_url));
 
-        //  출처 : https://stackoverflow.com/questions/10903754/input-text-dialog-android
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("URL 입력");
+            // Set up the input
+            final EditText editText = new EditText(requireContext());
+            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+            editText.setInputType(InputType.TYPE_CLASS_TEXT);
+            builder.setView(editText);
 
-        // Set up the input
-        final EditText editText = new EditText(requireContext());
-        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        editText.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(editText);
+            // Set up the buttons
+            builder.setPositiveButton(getString(R.string.confirm), (dialog, which) -> {
+                String input = editText.getText().toString();
+                viewModel.addImage(new ImageData(ImageData.URL, Uri.parse(input).toString()));
 
-        // Set up the buttons
-        builder.setPositiveButton("OK", (dialog, which) -> {
-            String input = editText.getText().toString();
-            viewModel.addImage(new ImageData(ImageData.URL, Uri.parse(input).toString()));
-
-            EditorImageAdapter memoImageAdapter = (EditorImageAdapter) binding.rvImage.getAdapter();
-            if (memoImageAdapter != null) {
-                int itemCount = memoImageAdapter.getItemCount();
-                memoImageAdapter.notifyItemInserted(itemCount - 1);
-            }
-        });
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-
-        builder.show();
-    }
-
-    @Override
-    public void onItemClick(int position) {
-
-    }
-
-    @Override
-    public void onLoadFail(ImageData imageData) {
-        int targetIndex = viewModel.removeImage(imageData);
-        EditorImageAdapter memoImageAdapter = (EditorImageAdapter) binding.rvImage.getAdapter();
-        if (memoImageAdapter != null && targetIndex != -1) {
-            memoImageAdapter.notifyItemRemoved(targetIndex);
+                EditorImageAdapter memoImageAdapter = (EditorImageAdapter) binding.rvImage.getAdapter();
+                if (memoImageAdapter != null) {
+                    int itemCount = memoImageAdapter.getItemCount();
+                    memoImageAdapter.notifyItemInserted(itemCount - 1);
+                }
+            });
+            builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel());
+            builder.show();
+        } else {
+            ToastPrinter.show(getString(R.string.an_internet_connection_is_required), requireContext());
         }
+    }
+
+    @Override
+    public void onItemClick(ImageData imageData) {
+        if (imageData.getType() == ImageData.CAMERA) {
+            try {
+                String filePath = imageData.getFilePath();
+                File file = new File(filePath);
+                if (file.exists()) {
+                    //noinspection ResultOfMethodCallIgnored
+                    file.delete();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        viewModel.removeImage();
+    }
+
+    @Override
+    public void onLoadFail() {
+        ToastPrinter.show(getString(R.string.failed_to_load_image), requireContext());
     }
 
     @Override
@@ -269,7 +291,8 @@ public class EditorFragment extends Fragment
             case REQUEST_CAMERA:
                 if (resultCode == AppCompatActivity.RESULT_OK) {
 
-                    viewModel.addImage(new ImageData(ImageData.CAMERA, photoUri.toString()));
+                    // 카메라 촬영 후 저장된 이미지는 파일 경로도 함께 저장한다.(삭제를 위해)
+                    viewModel.addImage(new ImageData(ImageData.CAMERA, photoUri.toString(), currentPhotoPath));
 
                     EditorImageAdapter memoImageAdapter = (EditorImageAdapter) binding.rvImage.getAdapter();
                     if (memoImageAdapter != null) {
@@ -277,7 +300,6 @@ public class EditorFragment extends Fragment
                         memoImageAdapter.notifyItemInserted(itemCount - 1);
                     }
                 }
-
                 break;
             case REQUEST_GALLERY:
                 if (resultCode == AppCompatActivity.RESULT_OK) {
@@ -295,26 +317,7 @@ public class EditorFragment extends Fragment
                     }
                 }
                 break;
-            case REQUEST_URL:
-                break;
         }
-    }
-
-    private int exifOrientationToDegrees(int exifOrientation) {
-        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
-            return 90;
-        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
-            return 180;
-        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
-            return 270;
-        }
-        return 0;
-    }
-
-    private Bitmap rotate(Bitmap bitmap, float degree) {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(degree);
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
     @Override

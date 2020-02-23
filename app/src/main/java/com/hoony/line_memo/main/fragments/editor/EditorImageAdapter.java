@@ -7,11 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.databinding.DataBindingUtil;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -23,35 +18,29 @@ import com.hoony.line_memo.db.pojo.ImageData;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.RecyclerView;
+
+/**
+ * {@link EditorFragment} 의 이미지 리스트 어탭터.
+ */
 public class EditorImageAdapter extends RecyclerView.Adapter {
 
     private List<ImageData> mList;
     private MemoImageAdapterListener mListener;
     private Context mContext;
 
-    public EditorImageAdapter(List<ImageData> mList, MemoImageAdapterListener listener) {
+    EditorImageAdapter(List<ImageData> mList, MemoImageAdapterListener listener) {
         this.mList = mList;
         this.mListener = listener;
     }
 
-    public void setImageDataList(List<ImageData> imageDataList) {
-        this.mList = imageDataList;
-    }
-
-    void addImageData(List<ImageData> imageDataList) {
-        int beforeListSize = mList.size();
-
-        this.mList.addAll(imageDataList);
-
-        int afterListSize = mList.size();
-
-        notifyItemRangeInserted(beforeListSize, afterListSize - 1);
-    }
-
     interface MemoImageAdapterListener {
-        void onItemClick(int position);
+        void onItemClick(ImageData imageData);
 
-        void onLoadFail(ImageData imageData);
+        void onLoadFail();
     }
 
     @NonNull
@@ -75,7 +64,7 @@ public class EditorImageAdapter extends RecyclerView.Adapter {
                 .addListener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        if (mListener != null) mListener.onLoadFail(imageData);
+                        if (mListener != null) mListener.onLoadFail();
                         return false;
                     }
 
@@ -84,6 +73,7 @@ public class EditorImageAdapter extends RecyclerView.Adapter {
                         return false;
                     }
                 })
+                .error(R.drawable.ic_error_red_a200_24dp)
                 .into(binding.ivPhoto);
     }
 
@@ -103,11 +93,11 @@ public class EditorImageAdapter extends RecyclerView.Adapter {
                 binding.ibDelete.setOnClickListener(view -> {
                     int position = getAdapterPosition();
                     if (mListener != null && position != RecyclerView.NO_POSITION) {
+                        ImageData imageData = mList.get(position);
+                        mListener.onItemClick(imageData);
 
                         mList.remove(position);
                         notifyItemRemoved(position);
-
-                        mListener.onItemClick(position);
                     }
                 });
             }

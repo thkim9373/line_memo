@@ -12,6 +12,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.hoony.line_memo.R;
 import com.hoony.line_memo.databinding.BottomSheetDialogPhotoBinding;
 
+/**
+ * {@link EditorFragment} 이미지 추가 버튼을 클릭했을 때 생성되는 Bottom sheet dialog.
+ */
 public class AddPhotoBottomSheetDialog extends BottomSheetDialog implements View.OnClickListener {
 
     private final AddPhotoBottomSheetDialogListener mListener;

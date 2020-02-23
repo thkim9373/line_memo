@@ -8,7 +8,8 @@ import android.net.NetworkInfo;
 import android.os.Build;
 
 public class InternetStateChecker {
-    public static boolean checkNetworkConneted(Context context) {
+    @SuppressWarnings("deprecation")
+    public static boolean checkNetworkConnected(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (cm == null) return false;
 
