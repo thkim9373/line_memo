@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">line_memo</string>
+    <string name="app_name">Hoony Memo</string>
     
     <string name="do_you_want_to_delete_the_note">메모를 삭제 하시겠습니까?</string>
     

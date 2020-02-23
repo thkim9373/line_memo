@@ -14,6 +14,7 @@ import com.hoony.line_memo.repository.task.GetAllMemoTask;
 import com.hoony.line_memo.repository.task.InsertMemoTask;
 import com.hoony.line_memo.repository.task.UpdateMemoTask;
 
+import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.text.SimpleDateFormat;
@@ -173,13 +174,6 @@ public class MainViewModel extends AndroidViewModel
     }
 
     public void removeImage() {
-//        Memo memo = this.editMemoMutableData.getValue();
-//        if (memo == null) return -1;
-//
-//        if (memo.getImageDataList() == null) memo.setImageDataList(new ArrayList<>());
-//
-//        int targetIndex = memo.getImageDataList().indexOf(imageData);
-//        memo.getImageDataList().remove(imageData);
         this.isUpdate.setValue(true);
     }
 
@@ -226,12 +220,44 @@ public class MainViewModel extends AndroidViewModel
     }
 
     public void deleteMemoList(List<Memo> memoList) {
+
+        for (Memo memo : memoList) {
+            for (ImageData imageData : memo.getImageDataList()) {
+                if (imageData.getType() == ImageData.CAMERA) {  //  카메라로 찍은 이미지를 삭제한다.
+                    try {
+                        String filePath = imageData.getFilePath();
+                        File file = new File(filePath);
+                        if (file.exists()) {
+                            //noinspection ResultOfMethodCallIgnored
+                            file.delete();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
         appRepository.deleteMemoList(memoList, MainViewModel.this);
     }
 
     public void deleteMemo() {
         Memo memo = this.readMemoMutableData.getValue();
         if (memo == null) return;
+
+        for (ImageData imageData : memo.getImageDataList()) {
+            if (imageData.getType() == ImageData.CAMERA) {  //  카메라로 찍은 이미지를 삭제한다.
+                try {
+                    String filePath = imageData.getFilePath();
+                    File file = new File(filePath);
+                    if (file.exists()) {
+                        //noinspection ResultOfMethodCallIgnored
+                        file.delete();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
         appRepository.deleteMemo(memo, MainViewModel.this);
     }

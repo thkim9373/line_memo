@@ -185,6 +185,8 @@ public class EditorFragment extends Fragment
         sendTakePhotoIntent();
     }
 
+    //  카메라 촬영 출처 : https://developer.android.com/training/camera/photobasics?hl=ko
+    //                   https://black-jin0427.tistory.com/120
     private Uri photoUri;
 
     private void sendTakePhotoIntent() {
@@ -239,7 +241,6 @@ public class EditorFragment extends Fragment
 
             // Set up the input
             final EditText editText = new EditText(requireContext());
-            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
             editText.setInputType(InputType.TYPE_CLASS_TEXT);
             builder.setView(editText);
 
@@ -263,7 +264,7 @@ public class EditorFragment extends Fragment
 
     @Override
     public void onItemClick(ImageData imageData) {
-        if (imageData.getType() == ImageData.CAMERA) {
+        if (imageData.getType() == ImageData.CAMERA) {  //  카메라로 찍은 이미지를 삭제한다.
             try {
                 String filePath = imageData.getFilePath();
                 File file = new File(filePath);
